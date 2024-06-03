@@ -15,7 +15,10 @@ struct NetworkProgrammingProjectApp: App {
         WindowGroup {
             AuthView(viewModel: AuthViewModel())
                 .environmentObject(viewModel)
-//            VendingMachineTestView()
+                .onAppear {
+                    viewModel.send(action: .fetchStock)                    
+                    viewModel.send(action: .fetchMoney)
+                }
         }
     }
 }

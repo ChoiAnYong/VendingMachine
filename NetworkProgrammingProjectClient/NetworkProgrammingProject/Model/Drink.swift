@@ -8,7 +8,8 @@
 import Foundation
 
 struct Drink: Hashable {
-    let name: String
+    var name: String
     var price: Int
     var stock: Int
+    let imageName: String
 }

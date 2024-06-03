@@ -12,9 +12,13 @@
 		AD14F0762C08C225004C43ED /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD14F0752C08C225004C43ED /* AuthView.swift */; };
 		AD14F0782C08C230004C43ED /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD14F0772C08C230004C43ED /* AuthViewModel.swift */; };
 		AD14F07B2C08C61A004C43ED /* ManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD14F07A2C08C61A004C43ED /* ManagerView.swift */; };
+		ADA8EE612C0DD70F00A9BBB8 /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA8EE602C0DD70F00A9BBB8 /* ChangeNameView.swift */; };
+		ADA8EE632C0DD72700A9BBB8 /* ChangePriceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA8EE622C0DD72700A9BBB8 /* ChangePriceView.swift */; };
+		ADA8EE652C0DD76D00A9BBB8 /* ChangeNameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA8EE642C0DD76D00A9BBB8 /* ChangeNameViewModel.swift */; };
+		ADA8EE672C0DF55800A9BBB8 /* ChangePriceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA8EE662C0DF55800A9BBB8 /* ChangePriceViewModel.swift */; };
 		ADAF02F12C09E72200323713 /* ManagerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADAF02F02C09E72200323713 /* ManagerViewModel.swift */; };
-		ADAF02F42C09E7B100323713 /* ChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADAF02F32C09E7B100323713 /* ChangeView.swift */; };
-		ADAF02F62C09E7BE00323713 /* ChangeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADAF02F52C09E7BE00323713 /* ChangeViewModel.swift */; };
+		ADAF02F42C09E7B100323713 /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADAF02F32C09E7B100323713 /* ChangePasswordView.swift */; };
+		ADAF02F62C09E7BE00323713 /* ChangePasswordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADAF02F52C09E7BE00323713 /* ChangePasswordViewModel.swift */; };
 		ADDDF3B42BB2D0EA00923127 /* NetworkProgrammingProjectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADDDF3B32BB2D0EA00923127 /* NetworkProgrammingProjectApp.swift */; };
 		ADDDF3B82BB2D0EC00923127 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADDDF3B72BB2D0EC00923127 /* Assets.xcassets */; };
 		ADDDF3BB2BB2D0EC00923127 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADDDF3BA2BB2D0EC00923127 /* Preview Assets.xcassets */; };
@@ -32,9 +36,13 @@
 		AD14F0752C08C225004C43ED /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		AD14F0772C08C230004C43ED /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		AD14F07A2C08C61A004C43ED /* ManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerView.swift; sourceTree = "<group>"; };
+		ADA8EE602C0DD70F00A9BBB8 /* ChangeNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameView.swift; sourceTree = "<group>"; };
+		ADA8EE622C0DD72700A9BBB8 /* ChangePriceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePriceView.swift; sourceTree = "<group>"; };
+		ADA8EE642C0DD76D00A9BBB8 /* ChangeNameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameViewModel.swift; sourceTree = "<group>"; };
+		ADA8EE662C0DF55800A9BBB8 /* ChangePriceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePriceViewModel.swift; sourceTree = "<group>"; };
 		ADAF02F02C09E72200323713 /* ManagerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerViewModel.swift; sourceTree = "<group>"; };
-		ADAF02F32C09E7B100323713 /* ChangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeView.swift; sourceTree = "<group>"; };
-		ADAF02F52C09E7BE00323713 /* ChangeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeViewModel.swift; sourceTree = "<group>"; };
+		ADAF02F32C09E7B100323713 /* ChangePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordView.swift; sourceTree = "<group>"; };
+		ADAF02F52C09E7BE00323713 /* ChangePasswordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordViewModel.swift; sourceTree = "<group>"; };
 		ADDDF3B02BB2D0EA00923127 /* NetworkProgrammingProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkProgrammingProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADDDF3B32BB2D0EA00923127 /* NetworkProgrammingProjectApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProgrammingProjectApp.swift; sourceTree = "<group>"; };
 		ADDDF3B72BB2D0EC00923127 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -89,11 +97,39 @@
 			path = Manager;
 			sourceTree = "<group>";
 		};
+		ADA8EE5D2C0DD6A300A9BBB8 /* Password */ = {
+			isa = PBXGroup;
+			children = (
+				ADAF02F32C09E7B100323713 /* ChangePasswordView.swift */,
+				ADAF02F52C09E7BE00323713 /* ChangePasswordViewModel.swift */,
+			);
+			path = Password;
+			sourceTree = "<group>";
+		};
+		ADA8EE5E2C0DD6B200A9BBB8 /* Price */ = {
+			isa = PBXGroup;
+			children = (
+				ADA8EE622C0DD72700A9BBB8 /* ChangePriceView.swift */,
+				ADA8EE662C0DF55800A9BBB8 /* ChangePriceViewModel.swift */,
+			);
+			path = Price;
+			sourceTree = "<group>";
+		};
+		ADA8EE5F2C0DD6BC00A9BBB8 /* Name */ = {
+			isa = PBXGroup;
+			children = (
+				ADA8EE602C0DD70F00A9BBB8 /* ChangeNameView.swift */,
+				ADA8EE642C0DD76D00A9BBB8 /* ChangeNameViewModel.swift */,
+			);
+			path = Name;
+			sourceTree = "<group>";
+		};
 		ADAF02F22C09E7A300323713 /* Change */ = {
 			isa = PBXGroup;
 			children = (
-				ADAF02F32C09E7B100323713 /* ChangeView.swift */,
-				ADAF02F52C09E7BE00323713 /* ChangeViewModel.swift */,
+				ADA8EE5F2C0DD6BC00A9BBB8 /* Name */,
+				ADA8EE5E2C0DD6B200A9BBB8 /* Price */,
+				ADA8EE5D2C0DD6A300A9BBB8 /* Password */,
 			);
 			path = Change;
 			sourceTree = "<group>";
@@ -150,8 +186,8 @@
 		ADDDF3C22BB2D21F00923127 /* Login */ = {
 			isa = PBXGroup;
 			children = (
-				ADDDF3C32BB2D24D00923127 /* LoginViewModel.swift */,
 				ADDDF3C52BB2D26C00923127 /* LoginView.swift */,
+				ADDDF3C32BB2D24D00923127 /* LoginViewModel.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -253,17 +289,21 @@
 			files = (
 				ADDDF3C42BB2D24D00923127 /* LoginViewModel.swift in Sources */,
 				ADE168642C0766F300F6AFF4 /* DrinkView.swift in Sources */,
-				ADAF02F62C09E7BE00323713 /* ChangeViewModel.swift in Sources */,
+				ADAF02F62C09E7BE00323713 /* ChangePasswordViewModel.swift in Sources */,
 				AD14F0762C08C225004C43ED /* AuthView.swift in Sources */,
 				AD14F0722C08C15C004C43ED /* VendingMachineView.swift in Sources */,
 				ADDDF3C62BB2D26C00923127 /* LoginView.swift in Sources */,
+				ADA8EE632C0DD72700A9BBB8 /* ChangePriceView.swift in Sources */,
 				ADDF011C2C086E340087E6B8 /* Money.swift in Sources */,
 				AD14F06F2C08B516004C43ED /* CoinView.swift in Sources */,
 				ADAF02F12C09E72200323713 /* ManagerViewModel.swift in Sources */,
+				ADA8EE672C0DF55800A9BBB8 /* ChangePriceViewModel.swift in Sources */,
+				ADA8EE612C0DD70F00A9BBB8 /* ChangeNameView.swift in Sources */,
 				ADE168592C073C7200F6AFF4 /* VendingMachineViewModel.swift in Sources */,
 				ADE1685F2C074DAE00F6AFF4 /* VendingMachineTestView.swift in Sources */,
 				AD14F07B2C08C61A004C43ED /* ManagerView.swift in Sources */,
-				ADAF02F42C09E7B100323713 /* ChangeView.swift in Sources */,
+				ADA8EE652C0DD76D00A9BBB8 /* ChangeNameViewModel.swift in Sources */,
+				ADAF02F42C09E7B100323713 /* ChangePasswordView.swift in Sources */,
 				ADDF011A2C086D9B0087E6B8 /* Drink.swift in Sources */,
 				AD14F0782C08C230004C43ED /* AuthViewModel.swift in Sources */,
 				ADDDF3B42BB2D0EA00923127 /* NetworkProgrammingProjectApp.swift in Sources */,
@@ -408,6 +448,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -437,6 +478,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

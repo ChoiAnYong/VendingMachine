@@ -7,11 +7,12 @@
 
 import SwiftUI
 
-struct ChangeView: View {
+struct ChangePasswordView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var viewModel = ChangeViewModel()
+    @StateObject private var viewModel = ChangePasswordViewModel()
     @FocusState private var textFocus
     @EnvironmentObject private var authViewModel: AuthViewModel
+    @EnvironmentObject private var vendingViewModel: VendingMachineViewModel
     
     var body: some View {
         NavigationStack {
@@ -34,7 +35,7 @@ struct ChangeView: View {
                 
                 Button(action: {
                     if viewModel.isPasswordValid() {
-                        print("dk")
+                        vendingViewModel.send(action: .changePassword(newPassword: viewModel.password))
                     }
                 }, label: {
                     Text("변경하기")
@@ -73,19 +74,11 @@ struct ChangeView: View {
                     })
                 }
             }
- 
-//            .alert("비밀번호는 특수문자 및 숫자가 각각 하나 이상 포함된 8자리 이상이여야 합니다.", isPresented: $viewModel.isPresentFailAlert) {
-//                Button(action: {
-//                    view
-//                }, label: {
-//                    Text("확인")
-//                })
-//            }
         }
         
     }
 }
 
 #Preview {
-    ChangeView()
+    ChangePasswordView()
 }

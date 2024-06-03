@@ -40,7 +40,6 @@ struct CoinView: View {
                                 .stroke(Color.black, lineWidth: 2)
                         }
                     }
-                Text("\(money.stock)")
             }
         })
         .disabled((money.price == 1000 && viewModel.count == 5) || viewModel.insertMoney + money.price > 7000)

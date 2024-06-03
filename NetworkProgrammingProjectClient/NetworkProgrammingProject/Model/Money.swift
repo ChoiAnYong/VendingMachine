@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Money {
+struct Money: Hashable {
     let price: Int
     var stock: Int
 }

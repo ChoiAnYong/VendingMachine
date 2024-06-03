@@ -9,4 +9,6 @@ import Foundation
 
 final class ManagerViewModel: ObservableObject {
     @Published var isPresent = false
+    @Published var isPresentChangePrice = false
+    @Published var isPresentChangeName = false
 }

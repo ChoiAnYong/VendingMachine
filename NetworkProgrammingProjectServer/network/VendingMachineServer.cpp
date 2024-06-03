@@ -33,6 +33,7 @@ std::mutex clients_mtx;
 struct Drink {
     int stock;
     int price;
+    std::string imageName;
 };
 
 struct User {
@@ -40,6 +41,8 @@ struct User {
     std::string password;
 };
 
+
+// 파일에서 데이터 가져오는 부분
 User load_user() {
     std::ifstream infile(USER_FILE);
     User user;
@@ -68,11 +71,11 @@ std::map<int, int> load_money() {
 std::map<std::string, Drink> load_data() {
     std::ifstream infile(DATA_FILE);
     std::map<std::string, Drink> data;
-    std::string name;
+    std::string name, imageName;
     int stock, price;
     
-    while (infile >> name >> stock >> price) {
-        data[name] = { stock, price };
+    while (infile >> name >> stock >> price >> imageName) {
+        data[name] = { stock, price, imageName };
     }
     
     return data;
@@ -90,7 +93,9 @@ std::map<std::string, std::map<std::string, int>> load_sales() {
     
     return sales;
 }
+//
 
+// 파일에 데이터 업데이트 하는 부분
 void save_user(User user) {
     std::ofstream outfile(USER_FILE);
     outfile << user.userId << " " << user.password << std::endl;
@@ -99,7 +104,7 @@ void save_user(User user) {
 void save_data(const std::map<std::string, Drink>& data) {
     std::ofstream outfile(DATA_FILE);
     for (const auto& item : data) {
-        outfile << item.first << " " << item.second.stock << " " << item.second.price << std::endl;
+        outfile << item.first << " " << item.second.stock << " " << item.second.price << " " << item.second.imageName << std::endl;
     }
 }
 
@@ -118,6 +123,7 @@ void save_sales(const std::map<std::string, std::map<std::string, int>>& sales) 
         }
     }
 }
+//
 
 std::string current_date() {
     time_t t = time(nullptr);
@@ -172,6 +178,8 @@ void handle_insertMoney(int client_sock, int price, int index) {
         save_money(data);
         response = "INSERT: " + std::to_string(index) + " " + std::to_string(data[price]);
     }
+    
+    broadcast_message(response);
 }
 
 void handle_stock(int client_sock) {
@@ -180,7 +188,7 @@ void handle_stock(int client_sock) {
     std::stringstream ss;
 
     for (const auto& item : data) {
-        ss << "STOCK: " << item.first << " " << item.second.stock << " " << item.second.price << std::endl;
+        ss << "STOCK: " << item.first << " " << item.second.stock << " " << item.second.price << " " << item.second.imageName << std::endl;
     }
 
     std::string response = ss.str();
@@ -196,9 +204,9 @@ void handle_change_name(int client_sock, const std::string& old_name, const std:
         data[new_name] = data[old_name];
         data.erase(old_name);
         save_data(data);
-        response = "Successfully changed name from " + old_name + " to " + new_name + "\n";
+        response = "CHANGENAME: " + old_name + " " + new_name;
     } else {
-        response = "Failed to change name. " + old_name + " does not exist.\n";
+        response = "Failed" + old_name + " does not exist.\n";
     }
 
     broadcast_message(response);
@@ -230,33 +238,82 @@ void handle_money(int client_sock) {
     broadcast_message(response);
 }
 
-void handle_change_password(int client_sock, const std::string& old_password, const std::string& new_password) {
+void handle_change_password(int client_sock, const std::string& new_password) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_user();
+    
+    User newUser;
+    newUser = {data.userId, new_password};
+    save_user(newUser);
+    
     std::string response;
-
     
     response = "CHANGEPASSWORD: " + new_password;
     
-
     broadcast_message(response);
 }
 
-
-void handle_change_price(int client_sock, const std::string& old_price, const std::string& new_price) {
+void handle_change_price(int client_sock, const std::string& drink_name, const std::string& new_price) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_data();
     std::string response;
 
-    if (data.count(old_price)) {
-        data[new_price] = data[old_price];
-        data.erase(old_price);
+    if (data.count(drink_name)) {
+        data[drink_name].price = std::stoi(new_price);
         save_data(data);
-        response = "Successfully changed price from " + old_price + " to " + new_price + "\n";
+        response = "CHANGEPRICE: " + drink_name + " " + new_price;
     } else {
-        response = "Failed to change price. " + old_price + " does not exist.\n";
+        response = "Failed" + drink_name + " does not exist.\n";
     }
 
+    broadcast_message(response);
+}
+
+void handle_collect(int client_sock) {
+    std::lock_guard<std::mutex> lock(mtx);
+    auto data = load_money();
+    
+    for (auto& money : data) {
+        if (money.second > 10) {
+            money.second = 10;
+        }
+    }
+    
+    save_money(data);
+    
+    std::string response = "COLLECT: ";
+    
+    broadcast_message(response);
+}
+
+void handle_moneyreplenishment(int client_sock) {
+    std::lock_guard<std::mutex> lock(mtx);
+    auto data = load_money();
+    
+    for (auto& money : data) {
+        if (money.second < 10) {
+            money.second = 10;
+        }
+    }
+    
+    save_money(data);
+    
+    std::string response = "MONEYREPLENISHMENT: ";
+    
+    broadcast_message(response);
+}
+void handle_drinkreplenishment(int client_sock) {
+    std::lock_guard<std::mutex> lock(mtx);
+    auto data = load_data();
+    
+    for (auto& drink : data) {
+        drink.second.stock = 10;
+    }
+    
+    save_data(data);
+    
+    std::string response = "DRINKREPLENISHMENT: ";
+    
     broadcast_message(response);
 }
 
@@ -300,15 +357,25 @@ void handle_client(int client_sock) {
             std::string old_name, new_name;
             ss >> old_name >> new_name;
             handle_change_name(client_sock, old_name, new_name);
+        } else if (command == "CHANGE_PRICE") {
+            std::string drink_name, price_str;
+            ss >> drink_name >> price_str;
+            handle_change_price(client_sock, drink_name, price_str);
         } else if (command == "CHANGE_PASSWORD") {
-            std::string old_password, new_password;
-            ss >> old_password >> new_password;
-            handle_change_password(client_sock, old_password, new_password);
+            std::string new_password;
+            ss >> new_password;
+            handle_change_password(client_sock, new_password);
         } else if (command == "CHANGE_PRICE"){
             std::string old_price, new_price;
             ss >> old_price >> new_price;
             handle_change_price(client_sock, old_price, new_price);
-        }else {
+        } else if (command == "COLLECT") {
+            handle_collect(client_sock);
+        } else if (command == "MONEYREPLENISHMENT") {
+            handle_moneyreplenishment(client_sock);
+        }else if (command == "DRINKREPLENISHMENT") {
+            handle_drinkreplenishment(client_sock);
+        } else {
             std::string response = "Unknown command\n";
             broadcast_message(response);
         }

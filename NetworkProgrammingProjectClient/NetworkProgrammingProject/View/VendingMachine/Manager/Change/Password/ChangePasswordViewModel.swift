@@ -7,16 +7,16 @@
 
 import Foundation
 
-enum alert {
+enum PasswordAlert {
     case fail
     case success
     case none
 }
 
-final class ChangeViewModel: ObservableObject {
+final class ChangePasswordViewModel: ObservableObject {
     @Published var password = ""
     @Published var isPresentAlert = false
-    @Published var alertMode: alert = .none
+    @Published var alertMode: PasswordAlert = .none
     
     // 비밀번호 유효성 검사
     func isPasswordValid() -> Bool {

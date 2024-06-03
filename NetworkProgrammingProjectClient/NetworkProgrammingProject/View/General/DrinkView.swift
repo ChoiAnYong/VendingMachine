@@ -23,7 +23,8 @@ struct DrinkView: View {
             viewModel.send(action: .purchase(index: index))
         }, label: {
             VStack {
-                Image("\(drink.name)")
+                Text("\(drink.name)")
+                Image("\(drink.imageName)")
                     .resizable()
                     .frame(width: 120, height: 140)
                 Text("\(drink.price)원")
@@ -32,7 +33,6 @@ struct DrinkView: View {
                     .foregroundColor(Color.white)
                     .background(Color.purple)
                     .cornerRadius(25)
-                Text("\(drink.stock)")
             }
             .padding(10)
             .overlay {
@@ -75,6 +75,6 @@ struct DrinkView: View {
 }
 
 #Preview {
-    DrinkView(drink: .init(name: "coffee", price: 10, stock: 10), index: 1)
+    DrinkView(drink: .init(name: "coffee", price: 10, stock: 10, imageName: "물"), index: 1)
         .environmentObject(VendingMachineViewModel())
 }
