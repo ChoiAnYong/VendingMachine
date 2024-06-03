@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct NetworkProgrammingProjectApp: App {
+    @StateObject var viewModel = VendingMachineViewModel()
+    
     var body: some Scene {
         WindowGroup {
             AuthView(viewModel: AuthViewModel())
+                .environmentObject(viewModel)
 //            VendingMachineTestView()
         }
     }

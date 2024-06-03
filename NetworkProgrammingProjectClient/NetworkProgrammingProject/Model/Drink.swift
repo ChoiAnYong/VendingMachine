@@ -8,16 +8,7 @@
 import Foundation
 
 struct Drink: Hashable {
-    let name: DrinkEnum
+    let name: String
     var price: Int
     var stock: Int
-}
-
-enum DrinkEnum: String {
-    case water = "water"
-    case cola = "cola"
-    case coffee = "coffee"
-    case highCoffee = "high_coffee"
-    case pocari = "pocari"
-    case oronamin = "oronamin"
 }

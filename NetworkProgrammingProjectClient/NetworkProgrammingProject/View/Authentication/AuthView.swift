@@ -16,7 +16,7 @@ struct AuthView: View {
             case .authentication:
                 ManagerView()
             case .unAuthentication:
-                VendingMachineView(viewModel: VendingMachineViewModel())
+                VendingMachineView()
             }
         }
         .environmentObject(viewModel)

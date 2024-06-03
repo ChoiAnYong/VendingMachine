@@ -8,8 +8,8 @@
 import Foundation
 
 final class LoginViewModel: ObservableObject {
-    private var currentId = "dksdyd"
-    private var currentPass = "dksdyd"
+    private var currentId = ""
+    private var currentPass = ""
     
     @Published var id: String = ""
     @Published var password: String = ""
@@ -17,9 +17,14 @@ final class LoginViewModel: ObservableObject {
     
     private let pwRegex =  "^(?=.*[0-9])(?=.*[!@#$%^&*()_+=\\[\\]{}|;:'\",.<>?/~`-]).{8,}$"
     
+    func userInfoInit(_ id: String, _ password: String) {
+        self.currentId = id.trimmingCharacters(in: ["\n"])
+        self.currentPass = password.trimmingCharacters(in: ["\n"])
+    }
+    
     func checkLogin() -> Bool {
         if id != currentId || password != currentPass {
-            isPresentAlert = true
+                isPresentAlert = true
             return false
         } else {
             isPresentAlert = false

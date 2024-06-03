@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AD82E8232BFC9EBB00663F30 /* TCPServer_Variable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADE44CBF2BF34AF6005F7B8E /* TCPServer_Variable.cpp */; };
+		AD63C4AB2C0B0B1E00294595 /* VendingMachineServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD63C4A92C0B0B1E00294595 /* VendingMachineServer.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -23,10 +23,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AD2921C02C0B4F5F0092F1FB /* user_data.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = user_data.txt; sourceTree = "<group>"; };
+		AD63C4A92C0B0B1E00294595 /* VendingMachineServer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VendingMachineServer.cpp; sourceTree = "<group>"; };
+		AD63C4AA2C0B0B1E00294595 /* VendingMachineServer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = VendingMachineServer.hpp; sourceTree = "<group>"; };
+		AD63C4AC2C0B104B00294595 /* vending_machine_data.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = vending_machine_data.txt; sourceTree = "<group>"; };
+		AD63C4AD2C0B107800294595 /* sales_data.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = sales_data.txt; sourceTree = "<group>"; };
+		ADC17E742C0CBB2F00FB97CB /* money_data.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = money_data.txt; sourceTree = "<group>"; };
 		ADE44C9A2BF32AF3005F7B8E /* network */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = network; sourceTree = BUILT_PRODUCTS_DIR; };
-		ADE44C9D2BF32AF3005F7B8E /* TCPServer_Fixed.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TCPServer_Fixed.cpp; sourceTree = "<group>"; };
-		ADE44CA42BF32B24005F7B8E /* Common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Common.h; sourceTree = "<group>"; };
-		ADE44CBF2BF34AF6005F7B8E /* TCPServer_Variable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TCPServer_Variable.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,9 +62,12 @@
 		ADE44C9C2BF32AF3005F7B8E /* network */ = {
 			isa = PBXGroup;
 			children = (
-				ADE44C9D2BF32AF3005F7B8E /* TCPServer_Fixed.cpp */,
-				ADE44CBF2BF34AF6005F7B8E /* TCPServer_Variable.cpp */,
-				ADE44CA42BF32B24005F7B8E /* Common.h */,
+				AD63C4A92C0B0B1E00294595 /* VendingMachineServer.cpp */,
+				AD63C4AA2C0B0B1E00294595 /* VendingMachineServer.hpp */,
+				AD63C4AC2C0B104B00294595 /* vending_machine_data.txt */,
+				AD63C4AD2C0B107800294595 /* sales_data.txt */,
+				AD2921C02C0B4F5F0092F1FB /* user_data.txt */,
+				ADC17E742C0CBB2F00FB97CB /* money_data.txt */,
 			);
 			path = network;
 			sourceTree = "<group>";
@@ -123,7 +129,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AD82E8232BFC9EBB00663F30 /* TCPServer_Variable.cpp in Sources */,
+				AD63C4AB2C0B0B1E00294595 /* VendingMachineServer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

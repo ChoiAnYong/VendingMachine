@@ -9,9 +9,11 @@ import SwiftUI
 
 struct LoginView: View {
     @Environment(\.dismiss) var dismiss
+    
     @StateObject private var viewModel = LoginViewModel()
     @FocusState private var textFocus
     @EnvironmentObject private var authViewModel: AuthViewModel
+    @EnvironmentObject private var vendingViewModel: VendingMachineViewModel
     
     var body: some View {
         NavigationStack {
@@ -42,6 +44,7 @@ struct LoginView: View {
                 
                 Button(action: {
                     if viewModel.checkLogin() {
+                        vendingViewModel.send(action: .changePassword(newPassword: viewModel.password))
                         authViewModel.auth = .authentication
                     }
                 }, label: {
@@ -73,6 +76,11 @@ struct LoginView: View {
                     Text("확인")
                 })
             }
+        }
+        .onAppear {
+            viewModel.userInfoInit(vendingViewModel.userID, vendingViewModel.password)
+            print(vendingViewModel.userID)
+            print(vendingViewModel.password)
         }
         
     }

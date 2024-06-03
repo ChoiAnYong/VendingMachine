@@ -13,27 +13,35 @@ struct CoinView: View {
     var money: Money
     let index: Int
     
+    init(money: Money, index: Int) {
+        self.money = money
+        self.index = index
+    }
+    
     var body: some View {
         Button(action: {
             viewModel.send(action: .insertMoney(index: index))
         }, label: {
-            Text("\(money.price)원")
-                .font(.system(size: 14, weight: .bold))
-                .foregroundColor(.black)
-                .padding(7)
-                .frame(width: screenwidth/6)
-                .overlay {
-                    if ((money.price == 1000 && viewModel.count == 5) || viewModel.insertMoney + money.price > 7000) {
-                        RoundedRectangle(cornerRadius: 25)
-                            .stroke(Color.gray, lineWidth: 2)
-                            .background(Color.gray)
-                            .cornerRadius(25)
-                            .opacity(0.8)
-                    } else {
-                        RoundedRectangle(cornerRadius: 25)
-                            .stroke(Color.black, lineWidth: 2)
+            VStack {
+                Text("\(money.price)원")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.black)
+                    .padding(7)
+                    .frame(width: screenwidth/6)
+                    .overlay {
+                        if ((money.price == 1000 && viewModel.count == 5) || viewModel.insertMoney + money.price > 7000) {
+                            RoundedRectangle(cornerRadius: 25)
+                                .stroke(Color.gray, lineWidth: 2)
+                                .background(Color.gray)
+                                .cornerRadius(25)
+                                .opacity(0.8)
+                        } else {
+                            RoundedRectangle(cornerRadius: 25)
+                                .stroke(Color.black, lineWidth: 2)
+                        }
                     }
-                }
+                Text("\(money.stock)")
+            }
         })
         .disabled((money.price == 1000 && viewModel.count == 5) || viewModel.insertMoney + money.price > 7000)
     }

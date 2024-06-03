@@ -22,10 +22,9 @@
 		ADDDF3C62BB2D26C00923127 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADDDF3C52BB2D26C00923127 /* LoginView.swift */; };
 		ADDF011A2C086D9B0087E6B8 /* Drink.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADDF01192C086D9B0087E6B8 /* Drink.swift */; };
 		ADDF011C2C086E340087E6B8 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADDF011B2C086E340087E6B8 /* Money.swift */; };
-		ADE168592C073C7200F6AFF4 /* TcpSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE168582C073C7200F6AFF4 /* TcpSocket.swift */; };
+		ADE168592C073C7200F6AFF4 /* VendingMachineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE168582C073C7200F6AFF4 /* VendingMachineViewModel.swift */; };
 		ADE1685F2C074DAE00F6AFF4 /* VendingMachineTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE1685E2C074DAE00F6AFF4 /* VendingMachineTestView.swift */; };
 		ADE168642C0766F300F6AFF4 /* DrinkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE168632C0766F300F6AFF4 /* DrinkView.swift */; };
-		ADE168682C07791A00F6AFF4 /* VendingMachineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE168672C07791A00F6AFF4 /* VendingMachineViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,11 +43,10 @@
 		ADDDF3C52BB2D26C00923127 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		ADDF01192C086D9B0087E6B8 /* Drink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Drink.swift; sourceTree = "<group>"; };
 		ADDF011B2C086E340087E6B8 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
-		ADE168582C073C7200F6AFF4 /* TcpSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TcpSocket.swift; sourceTree = "<group>"; };
+		ADE168582C073C7200F6AFF4 /* VendingMachineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendingMachineViewModel.swift; sourceTree = "<group>"; };
 		ADE1685E2C074DAE00F6AFF4 /* VendingMachineTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendingMachineTestView.swift; sourceTree = "<group>"; };
 		ADE168602C07615500F6AFF4 /* VendingMachineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendingMachineView.swift; sourceTree = "<group>"; };
 		ADE168632C0766F300F6AFF4 /* DrinkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkView.swift; sourceTree = "<group>"; };
-		ADE168672C07791A00F6AFF4 /* VendingMachineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendingMachineViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,7 +65,7 @@
 			children = (
 				AD14F0792C08C60D004C43ED /* Manager */,
 				ADE168602C07615500F6AFF4 /* VendingMachineView.swift */,
-				ADE168672C07791A00F6AFF4 /* VendingMachineViewModel.swift */,
+				ADE168582C073C7200F6AFF4 /* VendingMachineViewModel.swift */,
 			);
 			path = VendingMachine;
 			sourceTree = "<group>";
@@ -170,7 +168,6 @@
 		ADE168572C073C6000F6AFF4 /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				ADE168582C073C7200F6AFF4 /* TcpSocket.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -263,8 +260,7 @@
 				ADDF011C2C086E340087E6B8 /* Money.swift in Sources */,
 				AD14F06F2C08B516004C43ED /* CoinView.swift in Sources */,
 				ADAF02F12C09E72200323713 /* ManagerViewModel.swift in Sources */,
-				ADE168682C07791A00F6AFF4 /* VendingMachineViewModel.swift in Sources */,
-				ADE168592C073C7200F6AFF4 /* TcpSocket.swift in Sources */,
+				ADE168592C073C7200F6AFF4 /* VendingMachineViewModel.swift in Sources */,
 				ADE1685F2C074DAE00F6AFF4 /* VendingMachineTestView.swift in Sources */,
 				AD14F07B2C08C61A004C43ED /* ManagerView.swift in Sources */,
 				ADAF02F42C09E7B100323713 /* ChangeView.swift in Sources */,

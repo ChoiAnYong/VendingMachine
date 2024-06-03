@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct VendingMachineView: View {
-    @StateObject var viewModel: VendingMachineViewModel
+    @EnvironmentObject var viewModel: VendingMachineViewModel
     @EnvironmentObject var AuthViewModel: AuthViewModel
     @State var isPresent = false
     
@@ -107,5 +107,6 @@ struct VendingMachineView: View {
 }
 
 #Preview {
-    VendingMachineView(viewModel: VendingMachineViewModel())
+    VendingMachineView()
+        .environmentObject(VendingMachineViewModel())
 }
