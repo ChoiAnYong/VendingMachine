@@ -30,6 +30,7 @@
 		AD63C4AD2C0B107800294595 /* sales_data.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = sales_data.txt; sourceTree = "<group>"; };
 		ADC17E742C0CBB2F00FB97CB /* money_data.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = money_data.txt; sourceTree = "<group>"; };
 		ADE44C9A2BF32AF3005F7B8E /* network */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = network; sourceTree = BUILT_PRODUCTS_DIR; };
+		ADEE5D4D2C0F7023009C95FF /* exhaustion_date.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = exhaustion_date.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +69,7 @@
 				AD63C4AD2C0B107800294595 /* sales_data.txt */,
 				AD2921C02C0B4F5F0092F1FB /* user_data.txt */,
 				ADC17E742C0CBB2F00FB97CB /* money_data.txt */,
+				ADEE5D4D2C0F7023009C95FF /* exhaustion_date.txt */,
 			);
 			path = network;
 			sourceTree = "<group>";

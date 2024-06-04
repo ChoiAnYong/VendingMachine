@@ -22,28 +22,31 @@ enum Action {
     case changePrice(drinkName: String, price: String)
 }
 
+enum DrinkAlert {
+    case success
+    case fail
+}
+
 final class VendingMachineViewModel: ObservableObject {
     @Published var drinks: [Drink] = []
     @Published var moneys: [Money] = []
     @Published var userID: String = ""
     @Published var password: String = ""
-    
-    
-    @Published var isDisplayCountAlert: Bool
-    @Published var isDisplaySoldoutAlert: Bool
     @Published var insertMoney: Int
+    @Published var isPresent: Bool = false
+    @Published var selectedDrink: Drink?
+    @Published var isPresentDrinkAlert: Bool = false
     
+    var alertMode: DrinkAlert = .success
     var count: Int // 지패 투입 개수 저장
     
     private var drinkIndex: Int = 0
     private var moneyIndex: Int = 0
-    
     private var connection: NWConnection?
+    private var returnMoneyList: [Int] = Array.init(repeating: 0, count: 5)
     
-    init(insertMoney: Int = 0, isDisplayCountAlert: Bool = false, isDisplaySoldoutAlert: Bool = false, count: Int = 0) {
+    init(insertMoney: Int = 0, count: Int = 0) {
         self.insertMoney = insertMoney
-        self.isDisplayCountAlert = isDisplayCountAlert
-        self.isDisplaySoldoutAlert = isDisplaySoldoutAlert
         self.count = count
         setupConnection()
         send(action: .fetchUser)
@@ -132,8 +135,9 @@ final class VendingMachineViewModel: ObservableObject {
                 self.changeNameResponse(response)
             } else if response.hasPrefix("CHANGEPRICE: ") {
                 self.changePriceResponse(response)
-            } else {
-                //                parseStockResponse(response)
+            } else if response.hasPrefix("RETURN: ") {
+                self.returnMoneyResponse(response)
+            }else {
             }
         }
     }
@@ -150,6 +154,22 @@ final class VendingMachineViewModel: ObservableObject {
         }
         DispatchQueue.main.async { [weak self] in
             self?.drinks = newDrinks.sorted(by: {$0.price < $1.price}) //버블 정렬
+        }
+    }
+    
+    private func returnMoneyResponse(_ response: String) {
+        var newMoneys: [Money] = []
+        let lines = response.split(separator: "\n")
+        for line in lines {
+            let components = line.split(separator: " ")
+            if components.count == 3, let price = Int(components[1]), let stock = Int(components[2]) {
+                let money = Money(price: price, stock: stock)
+                newMoneys.append(money)
+            }
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.moneys = newMoneys
         }
     }
     
@@ -325,11 +345,30 @@ final class VendingMachineViewModel: ObservableObject {
         }
     }
     
-//
-//    func changeDrinkName() {
-//        sendMessage("CHANGE_NAME \(oldName) \(newName)")
-//        receiveMessage()
-//    }
+    func returnMoney() {
+        if checkReturnMoney(0, true) {
+            insertMoney = 0
+            var requestStr = ""
+            
+            requestStr.append("10 \(returnMoneyList[0]) ")
+            requestStr.append("50 \(returnMoneyList[1])")
+            requestStr.append(" 100 \(returnMoneyList[2])")
+            requestStr.append(" 500 \(returnMoneyList[3])")
+            requestStr.append(" 1000 \(returnMoneyList[4])")
+            
+            for i in 0..<5 {
+                returnMoneyList[i] = 0
+            }
+            
+            DispatchQueue.global().async {
+                self.sendMessage("RETURN_MONEY \(requestStr)")
+                self.receiveMessage()
+            }
+            
+        } else {
+            print("잔액부족")
+        }
+    }
     
     func send(action: Action) {
         switch action {
@@ -353,7 +392,7 @@ final class VendingMachineViewModel: ObservableObject {
                 }
             }
         case .returnMoney:
-            break
+            returnMoney()
         case .fetchStock:
             fetchStock()
         case .fetchUser:
@@ -373,5 +412,33 @@ final class VendingMachineViewModel: ObservableObject {
         case .changePrice(drinkName: let drinkName, price: let price):
             changePrice(drinkName, price)
         }
+    }
+    
+    func checkReturnMoney(_ price: Int = 0, _ check: Bool = false) -> Bool {
+        var checkMoney = insertMoney - price
+        var tempMoneys = moneys
+        var tempReturnMoneyList = returnMoneyList
+                
+        for i in stride(from: 4, through: 0, by: -1) {
+            while checkMoney >= tempMoneys[i].price && tempMoneys[i].stock != 0 {
+                checkMoney -= tempMoneys[i].price
+                tempMoneys[i].stock -= 1
+                tempReturnMoneyList[i] += 1
+            }
+        }
+                
+        if checkMoney != 0 {
+            return false
+        }
+        
+        if check {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.moneys = tempMoneys
+            }
+            returnMoneyList = tempReturnMoneyList
+        }
+        
+        return true
     }
 }

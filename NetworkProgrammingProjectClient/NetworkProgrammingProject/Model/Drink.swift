@@ -7,7 +7,9 @@
 
 import Foundation
 
-struct Drink: Hashable {
+struct Drink: Hashable, Identifiable {
+    var id: UUID = UUID()
+    
     var name: String
     var price: Int
     var stock: Int

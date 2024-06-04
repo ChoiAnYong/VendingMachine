@@ -27,7 +27,6 @@
 		ADDF011A2C086D9B0087E6B8 /* Drink.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADDF01192C086D9B0087E6B8 /* Drink.swift */; };
 		ADDF011C2C086E340087E6B8 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADDF011B2C086E340087E6B8 /* Money.swift */; };
 		ADE168592C073C7200F6AFF4 /* VendingMachineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE168582C073C7200F6AFF4 /* VendingMachineViewModel.swift */; };
-		ADE1685F2C074DAE00F6AFF4 /* VendingMachineTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE1685E2C074DAE00F6AFF4 /* VendingMachineTestView.swift */; };
 		ADE168642C0766F300F6AFF4 /* DrinkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE168632C0766F300F6AFF4 /* DrinkView.swift */; };
 /* End PBXBuildFile section */
 
@@ -52,7 +51,6 @@
 		ADDF01192C086D9B0087E6B8 /* Drink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Drink.swift; sourceTree = "<group>"; };
 		ADDF011B2C086E340087E6B8 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
 		ADE168582C073C7200F6AFF4 /* VendingMachineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendingMachineViewModel.swift; sourceTree = "<group>"; };
-		ADE1685E2C074DAE00F6AFF4 /* VendingMachineTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendingMachineTestView.swift; sourceTree = "<group>"; };
 		ADE168602C07615500F6AFF4 /* VendingMachineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendingMachineView.swift; sourceTree = "<group>"; };
 		ADE168632C0766F300F6AFF4 /* DrinkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrinkView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -154,7 +152,6 @@
 			isa = PBXGroup;
 			children = (
 				ADDDF3B32BB2D0EA00923127 /* NetworkProgrammingProjectApp.swift */,
-				ADE168572C073C6000F6AFF4 /* Network */,
 				ADDDF3C12BB2D20900923127 /* View */,
 				ADDF01182C086D880087E6B8 /* Model */,
 				ADDDF3B72BB2D0EC00923127 /* Assets.xcassets */,
@@ -178,7 +175,6 @@
 				AD14F0712C08C13C004C43ED /* VendingMachine */,
 				ADDDF3C22BB2D21F00923127 /* Login */,
 				ADE168622C0766E200F6AFF4 /* General */,
-				ADE1685E2C074DAE00F6AFF4 /* VendingMachineTestView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -199,13 +195,6 @@
 				ADDF011B2C086E340087E6B8 /* Money.swift */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		ADE168572C073C6000F6AFF4 /* Network */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Network;
 			sourceTree = "<group>";
 		};
 		ADE168622C0766E200F6AFF4 /* General */ = {
@@ -300,7 +289,6 @@
 				ADA8EE672C0DF55800A9BBB8 /* ChangePriceViewModel.swift in Sources */,
 				ADA8EE612C0DD70F00A9BBB8 /* ChangeNameView.swift in Sources */,
 				ADE168592C073C7200F6AFF4 /* VendingMachineViewModel.swift in Sources */,
-				ADE1685F2C074DAE00F6AFF4 /* VendingMachineTestView.swift in Sources */,
 				AD14F07B2C08C61A004C43ED /* ManagerView.swift in Sources */,
 				ADA8EE652C0DD76D00A9BBB8 /* ChangeNameViewModel.swift in Sources */,
 				ADAF02F42C09E7B100323713 /* ChangePasswordView.swift in Sources */,

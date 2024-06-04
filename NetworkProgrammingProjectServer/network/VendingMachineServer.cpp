@@ -25,6 +25,7 @@
 #define SALES_FILE "sales_data.txt"
 #define USER_FILE "user_data.txt"
 #define MONEY_FILE "money_data.txt"
+#define EXHAUSTION_FILE "exhaustion_date.txt"
 
 std::mutex mtx;
 std::vector<int> client_sockets;
@@ -43,6 +44,18 @@ struct User {
 
 
 // 파일에서 데이터 가져오는 부분
+std::map<std::string, std::string> load_eh_date() {
+    std::ifstream infile(EXHAUSTION_FILE);
+    std::map<std::string, std::string> list;
+    std::string date, drink;
+    
+    while(infile >> date >> drink) {
+        list[date] = drink;
+    }
+    
+    return list;
+}
+
 User load_user() {
     std::ifstream infile(USER_FILE);
     User user;
@@ -96,6 +109,10 @@ std::map<std::string, std::map<std::string, int>> load_sales() {
 //
 
 // 파일에 데이터 업데이트 하는 부분
+void save_eh_date(const std::string, std::string) {
+    
+}
+
 void save_user(User user) {
     std::ofstream outfile(USER_FILE);
     outfile << user.userId << " " << user.password << std::endl;
@@ -169,8 +186,8 @@ void handle_buy(int client_sock, const std::string& drink, int index, int quanti
 }
 
 void handle_insertMoney(int client_sock, int price, int index) {
-    std::lock_guard<std::mutex> lock(mtx);
-    auto data = load_money();
+    std::lock_guard<std::mutex> lock(mtx); // 동시 접근 방지
+    auto data = load_money(); //현재 저장된 돈 데이터 불러옴
     std::string response;
     
     if (data.count(price)) {
@@ -179,6 +196,29 @@ void handle_insertMoney(int client_sock, int price, int index) {
         response = "INSERT: " + std::to_string(index) + " " + std::to_string(data[price]);
     }
     
+    broadcast_message(response);
+}
+
+void handle_return_money(int client_sock, const std::vector<int>& types, const std::vector<int>& counts) {
+    std::lock_guard<std::mutex> lock(mtx); // 동시 접근 방지
+    auto data = load_money(); //현재 저장된 돈 데이터 불러옴
+    std::stringstream ss;
+    
+    for (size_t i = 0; i < types.size(); i++) {
+        int type = types[i];
+        int count = counts[i];
+        
+        data[type] -= count;
+    }
+    
+    save_money(data);
+    
+    
+    for (const auto& item: data) {
+        ss << "RETURN: " << std::to_string(item.first) << " " << std::to_string(item.second) << std::endl;
+    }
+    
+    std::string response = ss.str();
     broadcast_message(response);
 }
 
@@ -302,6 +342,7 @@ void handle_moneyreplenishment(int client_sock) {
     
     broadcast_message(response);
 }
+
 void handle_drinkreplenishment(int client_sock) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_data();
@@ -373,8 +414,17 @@ void handle_client(int client_sock) {
             handle_collect(client_sock);
         } else if (command == "MONEYREPLENISHMENT") {
             handle_moneyreplenishment(client_sock);
-        }else if (command == "DRINKREPLENISHMENT") {
+        } else if (command == "DRINKREPLENISHMENT") {
             handle_drinkreplenishment(client_sock);
+        } else if (command == "RETURN_MONEY") {
+            std::vector<int> types(5);
+            std::vector<int> counts(5);
+            
+            for (int i = 0; i < 5; ++i) {
+                ss >> types[i] >> counts[i];
+            }
+            
+            handle_return_money(client_sock, types, counts);
         } else {
             std::string response = "Unknown command\n";
             broadcast_message(response);

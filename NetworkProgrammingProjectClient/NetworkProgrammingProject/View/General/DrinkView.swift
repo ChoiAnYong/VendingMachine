@@ -20,13 +20,24 @@ struct DrinkView: View {
     
     var body: some View {
         Button(action: {
-            viewModel.send(action: .purchase(index: index))
+            if viewModel.checkReturnMoney(drink.price) {
+                viewModel.send(action: .purchase(index: index))
+                viewModel.selectedDrink = drink
+                viewModel.isPresentDrinkAlert = true
+                viewModel.alertMode = .success
+            } else {
+                viewModel.isPresentDrinkAlert = true
+                viewModel.selectedDrink = drink
+                viewModel.alertMode = .fail
+            }
         }, label: {
             VStack {
                 Text("\(drink.name)")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(Color.black)
                 Image("\(drink.imageName)")
                     .resizable()
-                    .frame(width: 120, height: 140)
+                    .frame(width: 120, height: 100)
                 Text("\(drink.price)원")
                     .padding(.horizontal, 10)
                     .font(.system(size: 18, weight: .bold))

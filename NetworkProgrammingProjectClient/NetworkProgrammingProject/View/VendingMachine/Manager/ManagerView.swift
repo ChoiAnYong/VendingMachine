@@ -14,18 +14,22 @@ struct ManagerView: View {
     var colums: [GridItem] = Array(repeating: .init(.flexible()), count: 3)
     
     var body: some View {
-        ZStack {
-            VStack {
-                stateOfMoneyView
-                    .padding(.bottom, 10)
-                stateOfDrinkView
-            }
+        VStack {
             loginBtn
+        
+            stateOfMoneyView
+                .padding(.bottom, 10)
+            stateOfDrinkView
+            Spacer()
         }
     }
     
     var stateOfMoneyView: some View {
         VStack(alignment: .leading) {
+            Rectangle()
+                .frame(height: 1)
+                .padding(.bottom, 1)
+          
             HStack {
                 Text("화폐 현황")
                     .font(.system(size: 20, weight: .bold))
@@ -60,6 +64,8 @@ struct ManagerView: View {
                 }
 
             }
+            .padding(.horizontal, 20)
+            
             Rectangle()
                 .frame(height: 1)
             
@@ -68,15 +74,15 @@ struct ManagerView: View {
                     Text("\(money.price)원 \(money.stock)개")
                 }
             }
-            
-            Rectangle()
-                .frame(height: 1)
+            .padding(.horizontal, 20)
         }
-        .padding(.horizontal, 20)
     }
     
     var stateOfDrinkView: some View {
         VStack(alignment: .leading) {
+            Rectangle()
+                .frame(height: 1)
+          
             HStack {
                 Text("음료 현황")
                     .font(.system(size: 20, weight: .bold))
@@ -84,7 +90,7 @@ struct ManagerView: View {
                 Spacer()
                 
                 Button {
-                    viewModel.isPresentChangeName = true
+                        viewModel.changeIsPresent(.name)
                 } label: {
                    Text("이름변경")
                         .font(.system(size: 18, weight: .bold))
@@ -101,7 +107,7 @@ struct ManagerView: View {
                 
                 
                 Button {
-                    viewModel.isPresentChangePrice = true
+                        viewModel.changeIsPresent(.price)
                 } label: {
                    Text("가격변경")
                         .font(.system(size: 18, weight: .bold))
@@ -130,6 +136,8 @@ struct ManagerView: View {
                 }
 
             }
+            .padding(.horizontal, 20)
+            
             Rectangle()
                 .frame(height: 1)
             
@@ -138,47 +146,43 @@ struct ManagerView: View {
                     Text("\(drink.name) \(drink.stock)개")
                 }
             }
+            .padding(.horizontal, 20)
             
             Rectangle()
                 .frame(height: 1)
         }
-        .padding(.horizontal, 20)
-
     }
     
-    var loginBtn: some View {
-        VStack {
-            HStack {
-                Button(action: {
-                    viewModel.isPresent = true
-                }, label: {
-                    Text("비밀번호 변경")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(Color.black)
-                        .padding(5)
-                })
-                .overlay {
-                    Rectangle()
-                        .stroke()
-                }
-                Spacer()
-                Button(action: {
-                    authViewModel.auth = .unAuthentication
-                }, label: {
-                    Text("로그아웃")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(Color.black)
-                        .padding(5)
-                })
-                .overlay {
-                    Rectangle()
-                        .stroke()
-                }
-                .fullScreenCover(isPresented: $viewModel.isPresent, content: {
-                    ChangePasswordView()
-                })
+    var loginBtn: some View {        
+        HStack {
+            Button(action: {
+                viewModel.changeIsPresent(.password)
+            }, label: {
+                Text("비밀번호 변경")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(Color.black)
+                    .padding(5)
+            })
+            .overlay {
+                Rectangle()
+                    .stroke()
             }
             Spacer()
+            Button(action: {
+                authViewModel.auth = .unAuthentication
+            }, label: {
+                Text("로그아웃")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(Color.black)
+                    .padding(5)
+            })
+            .overlay {
+                Rectangle()
+                    .stroke()
+            }
+            .fullScreenCover(isPresented: $viewModel.isPresent, content: {
+                ChangePasswordView()
+            })
         }
         .padding(.horizontal, 20)
     }
