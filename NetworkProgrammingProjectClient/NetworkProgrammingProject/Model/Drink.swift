@@ -13,5 +13,5 @@ struct Drink: Hashable, Identifiable {
     var name: String
     var price: Int
     var stock: Int
-    let imageName: String
+    let fixedName: String
 }

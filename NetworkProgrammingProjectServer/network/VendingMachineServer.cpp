@@ -34,7 +34,7 @@ std::mutex clients_mtx;
 struct Drink {
     int stock;
     int price;
-    std::string imageName;
+    std::string name;
 };
 
 struct User {
@@ -42,6 +42,7 @@ struct User {
     std::string password;
 };
 
+std::map<std::string, std::map<std::string, int>> drink_sales;
 
 // 파일에서 데이터 가져오는 부분
 std::map<std::string, std::string> load_eh_date() {
@@ -84,33 +85,21 @@ std::map<int, int> load_money() {
 std::map<std::string, Drink> load_data() {
     std::ifstream infile(DATA_FILE);
     std::map<std::string, Drink> data;
-    std::string name, imageName;
+    std::string name, fixedName;
     int stock, price;
     
-    while (infile >> name >> stock >> price >> imageName) {
-        data[name] = { stock, price, imageName };
+    while (infile >> fixedName >> stock >> price >> name) {
+        data[fixedName] = { stock, price, name };
     }
     
     return data;
 }
-
-std::map<std::string, std::map<std::string, int>> load_sales() {
-    std::ifstream infile(SALES_FILE);
-    std::map<std::string, std::map<std::string, int>> sales;
-    std::string date, drink;
-    int amount;
-    
-    while (infile >> date >> drink >> amount) {
-        sales[date][drink] += amount;
-    }
-    
-    return sales;
-}
 //
 
 // 파일에 데이터 업데이트 하는 부분
-void save_eh_date(const std::string, std::string) {
-    
+void save_eh_date(const std::string& drink, const std::string& date) {
+    std::ofstream outfile(EXHAUSTION_FILE, std::ios::app); // 파일의 제일 마지막에 추가
+    outfile << date << " " << drink << " 재고 소진" << std::endl;
 }
 
 void save_user(User user) {
@@ -121,7 +110,7 @@ void save_user(User user) {
 void save_data(const std::map<std::string, Drink>& data) {
     std::ofstream outfile(DATA_FILE);
     for (const auto& item : data) {
-        outfile << item.first << " " << item.second.stock << " " << item.second.price << " " << item.second.imageName << std::endl;
+        outfile << item.first << " " << item.second.stock << " " << item.second.price << " " << item.second.name << std::endl;
     }
 }
 
@@ -131,16 +120,6 @@ void save_money(const std::map<int, int>& data) {
         outfile << item.first << " " << item.second << std::endl;
     }
 }
-
-void save_sales(const std::map<std::string, std::map<std::string, int>>& sales) {
-    std::ofstream outfile(SALES_FILE);
-    for (const auto& day : sales) {
-        for (const auto& item : day.second) {
-            outfile << day.first << " " << item.first << " " << item.second << std::endl;
-        }
-    }
-}
-//
 
 std::string current_date() {
     time_t t = time(nullptr);
@@ -152,12 +131,50 @@ std::string current_date() {
     return ss.str();
 }
 
-void update_sales_data(const std::string& drink, int quantity, int price) {
-    std::lock_guard<std::mutex> lock(mtx);
-    auto sales = load_sales();
-    std::string date = current_date();
-    sales[date][drink] += quantity * price;
-    save_sales(sales);
+std::string current_month() {
+    time_t t = time(nullptr);
+    tm* timePtr = localtime(&t);
+    std::stringstream ss;
+    ss << (timePtr->tm_year + 1900) << "-"
+       << (timePtr->tm_mon + 1);
+    return ss.str();
+}
+
+std::string current_date_time() {
+    time_t t = time(nullptr);
+    tm* timePtr = localtime(&t);
+    std::stringstream ss;
+    ss << (timePtr->tm_year + 1900) << "-"
+       << (timePtr->tm_mon + 1) << "-"
+       << timePtr->tm_mday << " "
+       << timePtr->tm_hour << ":"
+       << timePtr->tm_min;
+    return ss.str();
+}
+
+void save_sales_data() {
+    std::ofstream outfile(SALES_FILE);
+
+    for (const auto& date_entry : drink_sales) {
+        const std::string& date = date_entry.first;
+        const std::map<std::string, int>& daily_sales = date_entry.second;
+        for (const auto& drink_entry : daily_sales) {
+            const std::string& drink = drink_entry.first;
+            int sales_data = drink_entry.second;
+            outfile << date << " " << drink << " " << sales_data << std::endl;
+        }
+    }
+}
+
+void load_sales_data() {
+    std::ifstream infile(SALES_FILE);
+    std::string date, drink;
+    int sales_data;
+
+    while (infile >> date >> drink >> sales_data) {
+        // 매출 데이터를 drink_sales 맵에 추가
+        drink_sales[date][drink] = sales_data;
+    }
 }
 
 void broadcast_message(const std::string& message) {
@@ -171,17 +188,27 @@ void handle_buy(int client_sock, const std::string& drink, int index, int quanti
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_data();
     std::string response;
-
+    std::string date_time = current_date_time();
+    std::string date = current_date();
+    
     if (data.count(drink) && data[drink].stock >= quantity) {
         data[drink].stock -= quantity;
         save_data(data);
-//        update_sales_data(drink, quantity, data[drink].price);
+        
+        drink_sales[date][drink] += data[drink].price;
+                
+        if (data[drink].stock == 0) {
+            save_eh_date(drink, date_time);
+        }
+        
         response = "BUY: " + std::to_string(index) + " " + std::to_string(data[drink].stock);
         
     } else {
         response = "Failed to buy " + drink + ". Not enough stock or invalid item.\n";
     }
 
+    save_sales_data();
+    
     broadcast_message(response);
 }
 
@@ -228,7 +255,7 @@ void handle_stock(int client_sock) {
     std::stringstream ss;
 
     for (const auto& item : data) {
-        ss << "STOCK: " << item.first << " " << item.second.stock << " " << item.second.price << " " << item.second.imageName << std::endl;
+        ss << "STOCK: " << item.first << " " << item.second.stock << " " << item.second.price << " " << item.second.name << std::endl;
     }
 
     std::string response = ss.str();
@@ -239,15 +266,27 @@ void handle_change_name(int client_sock, const std::string& old_name, const std:
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_data();
     std::string response;
-
-    if (data.count(old_name)) {
-        data[new_name] = data[old_name];
-        data.erase(old_name);
-        save_data(data);
-        response = "CHANGENAME: " + old_name + " " + new_name;
-    } else {
-        response = "Failed" + old_name + " does not exist.\n";
+    
+    std::string target;
+    
+    for (const auto& item : data) {
+        if (item.second.name == old_name) {
+            target = item.first;
+        }
     }
+    
+    data[target].name = new_name;
+    save_data(data);
+    response = "CHANGENAME: " + old_name + " " + new_name;
+//
+//    if (data.count(old_name)) {
+//        data[new_name] = data[old_name];
+//        data.erase(old_name);
+//        save_data(data);
+//        response = "CHANGENAME: " + old_name + " " + new_name;
+//    } else {
+//        response = "Failed" + old_name + " does not exist.\n";
+//    }
 
     broadcast_message(response);
 }
@@ -439,6 +478,7 @@ void handle_client(int client_sock) {
 }
 
 int main() {
+    load_sales_data();
     int server_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (server_sock == -1) {
         perror("socket");

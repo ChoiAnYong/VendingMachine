@@ -148,7 +148,7 @@ final class VendingMachineViewModel: ObservableObject {
         for line in lines {
             let components = line.split(separator: " ")
             if components.count == 5, let stock = Int(components[2]), let price = Int(components[3]) {
-                let drink = Drink(name: String(components[1]), price: price, stock: stock, imageName: String(components[4]))
+                let drink = Drink(name: String(components[4]), price: price, stock: stock, fixedName: String(components[1]))
                 newDrinks.append(drink)
             }
         }
@@ -388,7 +388,7 @@ final class VendingMachineViewModel: ObservableObject {
                     drinkIndex = index
                     insertMoney -= drinks[index].price
                     drinks[index].stock -= 1
-                    buyDrink(drinks[index].name)
+                    buyDrink(drinks[index].fixedName)
                 }
             }
         case .returnMoney:

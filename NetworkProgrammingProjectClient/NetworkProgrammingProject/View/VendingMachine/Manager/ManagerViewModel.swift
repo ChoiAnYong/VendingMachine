@@ -12,6 +12,8 @@ final class ManagerViewModel: ObservableObject {
     @Published var isPresentChangePrice = false
     @Published var isPresentChangeName = false
     
+    
+    
     enum Present {
         case password
         case price

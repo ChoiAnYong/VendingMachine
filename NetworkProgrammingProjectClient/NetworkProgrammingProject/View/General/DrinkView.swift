@@ -35,7 +35,7 @@ struct DrinkView: View {
                 Text("\(drink.name)")
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(Color.black)
-                Image("\(drink.imageName)")
+                Image("\(drink.fixedName)")
                     .resizable()
                     .frame(width: 120, height: 100)
                 Text("\(drink.price)원")
@@ -86,6 +86,6 @@ struct DrinkView: View {
 }
 
 #Preview {
-    DrinkView(drink: .init(name: "coffee", price: 10, stock: 10, imageName: "물"), index: 1)
+    DrinkView(drink: .init(name: "coffee", price: 10, stock: 10, fixedName: "물"), index: 1)
         .environmentObject(VendingMachineViewModel())
 }

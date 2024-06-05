@@ -20,7 +20,8 @@ struct ManagerView: View {
             stateOfMoneyView
                 .padding(.bottom, 10)
             stateOfDrinkView
-            Spacer()
+            
+            salseView
         }
     }
     
@@ -185,6 +186,13 @@ struct ManagerView: View {
             })
         }
         .padding(.horizontal, 20)
+    }
+    
+    var salseView: some View {
+        VStack(alignment: .leading) {
+            Text("매출 현황")
+                .font(.system(size: 20, weight: .bold))
+        }
     }
 }
 
