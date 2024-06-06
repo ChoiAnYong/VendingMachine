@@ -82,6 +82,16 @@ struct VendingMachineView: View {
                         }
                 })
             }
+            .alert(isPresented: $viewModel.isReturnMoneyAlert) {
+                Alert(title: Text("잔돈이 반환되었습니다."),
+                      message: Text("10원 \(viewModel.returnMoneyList[0])개\n" +
+                                    "50원 \(viewModel.returnMoneyList[1])개\n" +
+                                    "100원 \(viewModel.returnMoneyList[2])개\n" +
+                                    "500원 \(viewModel.returnMoneyList[3])개\n" +
+                                    "1000원 \(viewModel.returnMoneyList[4])개"),
+                      dismissButton: .default(Text("확인"), action: viewModel.resetReturnMoney)
+                )
+            }
             Spacer()
         }
         .environmentObject(viewModel)

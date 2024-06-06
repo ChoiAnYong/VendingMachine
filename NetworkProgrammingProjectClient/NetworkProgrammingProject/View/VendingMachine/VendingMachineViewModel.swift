@@ -20,6 +20,7 @@ enum Action {
     case drinkReplenishment
     case changeName(oldName: String, newName: String)
     case changePrice(drinkName: String, price: String)
+    case fetchSales
 }
 
 enum DrinkAlert {
@@ -36,6 +37,8 @@ final class VendingMachineViewModel: ObservableObject {
     @Published var isPresent: Bool = false
     @Published var selectedDrink: Drink?
     @Published var isPresentDrinkAlert: Bool = false
+    @Published var isReturnMoneyAlert: Bool = false
+    @Published var sales: Sales = Sales()
     
     var alertMode: DrinkAlert = .success
     var count: Int // 지패 투입 개수 저장
@@ -43,7 +46,7 @@ final class VendingMachineViewModel: ObservableObject {
     private var drinkIndex: Int = 0
     private var moneyIndex: Int = 0
     private var connection: NWConnection?
-    private var returnMoneyList: [Int] = Array.init(repeating: 0, count: 5)
+    var returnMoneyList: [Int] = Array.init(repeating: 0, count: 5)
     
     init(insertMoney: Int = 0, count: Int = 0) {
         self.insertMoney = insertMoney
@@ -52,6 +55,55 @@ final class VendingMachineViewModel: ObservableObject {
         send(action: .fetchUser)
     }
     
+    func send(action: Action) {
+        switch action {
+        case .insertMoney(let index):
+            if insertMoney + moneys[index].price <= 7000 {
+                if moneys[index].price == 1000 {
+                    count += 1
+                }
+                moneyIndex = index
+                insertMoney += moneys[index].price
+                moneys[index].stock += 1
+                insertMoney(moneys[index].price)
+            }
+        case .purchase(let index):
+            if drinks[index].stock != 0 {
+                if insertMoney >= drinks[index].price {
+                    drinkIndex = index
+                    insertMoney -= drinks[index].price
+                    drinks[index].stock -= 1
+                    buyDrink(drinks[index].fixedName)
+                }
+            }
+        case .returnMoney:
+            returnMoney()
+        case .fetchStock:
+            fetchStock()
+        case .fetchUser:
+            fetchUserInfo()
+        case .fetchMoney:
+            fetchMoney()
+        case .changePassword(newPassword: let newPassword):
+            updateUserInfo(newPassword)
+        case .collectMoney:
+            collectMoeny()
+        case .moneyReplenishment:
+            moneyReplenishment()
+        case .drinkReplenishment:
+            drinkReplenishment()
+        case .changeName(oldName: let oldName, newName: let newName):
+            changeName(oldName, newName)
+        case .changePrice(drinkName: let drinkName, price: let price):
+            changePrice(drinkName, price)
+        case .fetchSales:
+            fetchSales()
+        }
+    }
+    private var receiveData = Data()
+}
+
+extension VendingMachineViewModel {
     private func setupConnection() {
         let host = NWEndpoint.Host("127.0.0.1")
         let port = NWEndpoint.Port(integerLiteral: 9000)
@@ -88,9 +140,12 @@ final class VendingMachineViewModel: ObservableObject {
         
         connection.receive(minimumIncompleteLength: 1, maximumLength: 1024) { data, _, isComplete, error in
             if let data = data, !data.isEmpty {
-                if let response = String(data: data, encoding: .utf8) {
-                    DispatchQueue.main.async {
-                        self.handleServerResponse(response)
+                self.receiveData.append(data)
+                if let response = String(data: self.receiveData, encoding: .utf8), response.contains("END_OF_RESPONSE") {
+                    let completeResponse = response.replacingOccurrences(of: "END_OF_RESPONSE", with: "")
+                    DispatchQueue.global().async {
+                        self.handleServerResponse(completeResponse)
+                        self.receiveData = Data() // 응답 처리 후 데이터 초기화
                     }
                 }
             }
@@ -137,8 +192,50 @@ final class VendingMachineViewModel: ObservableObject {
                 self.changePriceResponse(response)
             } else if response.hasPrefix("RETURN: ") {
                 self.returnMoneyResponse(response)
-            }else {
+            } else if response.hasPrefix("SALES: ") {
+                self.salesResponse(response)
+            } else {
             }
+        }
+    }
+    
+    private func salesResponse(_ response: String) {
+        var lines = response.split(separator: "\n")
+        lines.remove(at: 0)
+        
+        var result = Sales()
+        for line in lines {
+            var components = line.split(separator: " ")
+            
+            if components[0] == "Daily_Sales:" {
+                components.remove(at: 0)
+                for i in components.indices {
+                    let sales = components[i].split(separator: ":")
+                    result.dailySales.append((String(sales[0]), Int(sales[1])!))
+                }
+            } else if components[0] == "Monthly_Sales:" {
+                components.remove(at: 0)
+                for i in components.indices {
+                    let sales = components[i].split(separator: ":")
+                    result.monthSales.append((String(sales[0]), Int(sales[1])!))
+                }
+            } else if components[0] == "Drink_Daily_Sales:" {
+                components.remove(at: 0)
+                for i in components.indices {
+                    let sales = components[i].split(separator: ":")
+                    result.drinkDailySales.append((String(sales[0]), String(sales[1]), Int(sales[2])!))
+                }
+            } else if components[0] == "Drink_Monthly_Sales:" {
+                components.remove(at: 0)
+                for i in components.indices {
+                    let sales = components[i].split(separator: ":")
+                    result.drinkMonthSales.append((String(sales[0]), String(sales[1]), Int(sales[2])!))
+                }
+            }
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.sales = result
         }
     }
     
@@ -177,7 +274,7 @@ final class VendingMachineViewModel: ObservableObject {
         let response = response.split(separator: " ")
         
         DispatchQueue.main.async { [weak self] in
-            self?.drinks[Int(response[1])!].stock = Int(response[2])!
+            self?.drinks[Int(response[1])!].stock = Int(response[2].trimmingCharacters(in: ["\n"]))!
         }
     }
     
@@ -185,7 +282,7 @@ final class VendingMachineViewModel: ObservableObject {
         let response = response.split(separator: " ")
         
         
-        self.moneys[Int(response[1])!].stock = Int(response[2])!
+        self.moneys[Int(response[1])!].stock = Int(response[2].trimmingCharacters(in: ["\n"]))!
         
     }
     
@@ -199,27 +296,27 @@ final class VendingMachineViewModel: ObservableObject {
     private func changeUserInfoResponse(_ response: String) {
         let response = response.split(separator: " ")
 
-        password = String(response[1])
+        password = String(response[1].trimmingCharacters(in: ["\n"]))
     }
     
     private func changeNameResponse(_ response: String) {
         let response = response.split(separator: " ")
         
-        let index = drinks.firstIndex(where: { $0.name == String(response[1]) })
+        let index = drinks.firstIndex(where: { $0.name == String(response[1].trimmingCharacters(in: ["\n"])) })
         
         DispatchQueue.main.async { [weak self] in
-            self?.drinks[index!].name = String(response[2])
+            self?.drinks[index!].name = String(response[2].trimmingCharacters(in: ["\n"]))
         }
     }
     
     private func changePriceResponse(_ response: String) {
         let response = response.split(separator: " ")
         
-        let index = drinks.firstIndex(where: { $0.name == String(response[1]) })
+        let index = drinks.firstIndex(where: { $0.name == String(response[1].trimmingCharacters(in: ["\n"])) })
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.drinks[index!].price = Int(response[2])!
+            self.drinks[index!].price = Int(response[2].trimmingCharacters(in: ["\n"]))!
             self.drinks = self.drinks.sorted(by: {$0.price < $1.price}) //버블 정렬
         }
     }
@@ -265,6 +362,13 @@ final class VendingMachineViewModel: ObservableObject {
             for i in 0..<6 {
                 self?.drinks[i].stock = 10
             }
+        }
+    }
+    
+    func fetchSales() {
+        DispatchQueue.global().async {
+            self.sendMessage("FETCHSALES")
+            self.receiveMessage()
         }
     }
     
@@ -345,6 +449,12 @@ final class VendingMachineViewModel: ObservableObject {
         }
     }
     
+    func resetReturnMoney() {
+        for i in 0..<5 {
+            returnMoneyList[i] = 0
+        }
+    }
+    
     func returnMoney() {
         if checkReturnMoney(0, true) {
             insertMoney = 0
@@ -356,10 +466,8 @@ final class VendingMachineViewModel: ObservableObject {
             requestStr.append(" 500 \(returnMoneyList[3])")
             requestStr.append(" 1000 \(returnMoneyList[4])")
             
-            for i in 0..<5 {
-                returnMoneyList[i] = 0
-            }
-            
+            isReturnMoneyAlert = true
+
             DispatchQueue.global().async {
                 self.sendMessage("RETURN_MONEY \(requestStr)")
                 self.receiveMessage()
@@ -367,50 +475,6 @@ final class VendingMachineViewModel: ObservableObject {
             
         } else {
             print("잔액부족")
-        }
-    }
-    
-    func send(action: Action) {
-        switch action {
-        case .insertMoney(let index):
-            if insertMoney + moneys[index].price <= 7000 {
-                if moneys[index].price == 1000 {
-                    count += 1
-                }
-                moneyIndex = index
-                insertMoney += moneys[index].price
-                moneys[index].stock += 1
-                insertMoney(moneys[index].price)
-            }
-        case .purchase(let index):
-            if drinks[index].stock != 0 {
-                if insertMoney >= drinks[index].price {
-                    drinkIndex = index
-                    insertMoney -= drinks[index].price
-                    drinks[index].stock -= 1
-                    buyDrink(drinks[index].fixedName)
-                }
-            }
-        case .returnMoney:
-            returnMoney()
-        case .fetchStock:
-            fetchStock()
-        case .fetchUser:
-            fetchUserInfo()
-        case .fetchMoney:
-            fetchMoney()
-        case .changePassword(newPassword: let newPassword):
-            updateUserInfo(newPassword)
-        case .collectMoney:
-            collectMoeny()
-        case .moneyReplenishment:
-            moneyReplenishment()
-        case .drinkReplenishment:
-            drinkReplenishment()
-        case .changeName(oldName: let oldName, newName: let newName):
-            changeName(oldName, newName)
-        case .changePrice(drinkName: let drinkName, price: let price):
-            changePrice(drinkName, price)
         }
     }
     

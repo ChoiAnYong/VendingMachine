@@ -30,6 +30,5 @@ final class LoginViewModel: ObservableObject {
             isPresentAlert = false
             return true
         }
-    }
-    
+    }    
 }

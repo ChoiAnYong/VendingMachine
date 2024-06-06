@@ -11,8 +11,10 @@ final class ManagerViewModel: ObservableObject {
     @Published var isPresent = false
     @Published var isPresentChangePrice = false
     @Published var isPresentChangeName = false
-    
-    
+    @Published var isPresentDailySalse = false
+    @Published var isPresentMonthSalse = false
+    @Published var isPresentDrinkDailySalse = false
+    @Published var isPresentDrinkMonthSalse = false
     
     enum Present {
         case password

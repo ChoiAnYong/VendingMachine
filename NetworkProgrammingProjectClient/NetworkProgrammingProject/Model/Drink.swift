@@ -14,4 +14,6 @@ struct Drink: Hashable, Identifiable {
     var price: Int
     var stock: Int
     let fixedName: String
+    var isDailyPresent: Bool = false
+    var isMonthPresent: Bool = false
 }

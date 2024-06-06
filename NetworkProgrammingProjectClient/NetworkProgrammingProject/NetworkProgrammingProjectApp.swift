@@ -14,11 +14,7 @@ struct NetworkProgrammingProjectApp: App {
     var body: some Scene {
         WindowGroup {
             AuthView(viewModel: AuthViewModel())
-                .environmentObject(viewModel)
-                .onAppear {
-                    viewModel.send(action: .fetchStock)                    
-                    viewModel.send(action: .fetchMoney)
-                }
+                .environmentObject(viewModel)               
         }
     }
 }

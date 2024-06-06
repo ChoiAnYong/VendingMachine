@@ -11,6 +11,7 @@ struct ManagerView: View {
     @EnvironmentObject private var authViewModel: AuthViewModel
     @StateObject var viewModel = ManagerViewModel()
     @EnvironmentObject private var vendingViewModel: VendingMachineViewModel
+    private let screenWidth = UIScreen.main.bounds.width
     var colums: [GridItem] = Array(repeating: .init(.flexible()), count: 3)
     
     var body: some View {
@@ -20,16 +21,20 @@ struct ManagerView: View {
             stateOfMoneyView
                 .padding(.bottom, 10)
             stateOfDrinkView
-            
+                .padding(.bottom, 10)
             salseView
+            
+            Spacer()
+        }
+        .onAppear {
+            vendingViewModel.send(action: .fetchSales)
         }
     }
     
     var stateOfMoneyView: some View {
-        VStack(alignment: .leading) {
+        VStack {
             Rectangle()
                 .frame(height: 1)
-                .padding(.bottom, 1)
           
             HStack {
                 Text("화폐 현황")
@@ -189,13 +194,122 @@ struct ManagerView: View {
     }
     
     var salseView: some View {
-        VStack(alignment: .leading) {
-            Text("매출 현황")
-                .font(.system(size: 20, weight: .bold))
+        VStack {
+            Text("매출 확인")
+                .font(.system(size: 25, weight: .bold))
+            
+            HStack {
+                Button(action: {
+                    viewModel.isPresentDailySalse = true
+                }, label: {
+                    Text("일매출")
+                        .font(.system(size: 25, weight: .bold))
+                        .foregroundColor(Color.black)
+                        .padding(.vertical, 10)
+                })
+                .frame(width: screenWidth/2 - 10)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 5)
+                        .stroke()
+                }
+                .sheet(isPresented: $viewModel.isPresentDailySalse, content: {
+                    SalesView(title: "일매출", list: vendingViewModel.sales.dailySales)
+                })
+                
+                Button(action: {
+                    viewModel.isPresentMonthSalse = true
+                }, label: {
+                    Text("월매출")
+                        .font(.system(size: 25, weight: .bold))
+                        .foregroundColor(Color.black)
+                        .padding(.vertical, 10)
+                })
+                .frame(width: screenWidth/2 - 20)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 5)
+                        .stroke()
+                }
+                .sheet(isPresented: $viewModel.isPresentMonthSalse, content: {
+                    SalesView(title: "월매출", list: vendingViewModel.sales.monthSales)
+                })
+            }
+            
+            LazyVGrid(columns: colums, spacing: 20) {
+                ForEach(Array(zip(vendingViewModel.drinks.indices, vendingViewModel.drinks)), id: \.0) { index, drink in
+                    VStack {
+                        Text("\(drink.name)")
+                            .font(.system(size: 20, weight: .bold))
+                        
+                        Button(action: {
+                            vendingViewModel.drinks[index].isDailyPresent = true
+                        }, label: {
+                            Text("일매출")
+                                .font(.system(size: 15, weight: .bold))
+                                .foregroundColor(Color.black)
+                                .padding(.vertical, 10)
+                        })
+                        .frame(width: screenWidth/3 - 40)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 5)
+                                .stroke()
+                        }
+                        .sheet(isPresented: $vendingViewModel.drinks[index].isDailyPresent, content: {
+                            DrinkSalesView(title: "일매출", drink: "\(drink.fixedName)", list: vendingViewModel.sales.drinkDailySales)
+                        })
+                        
+                        Button(action: {
+                            vendingViewModel.drinks[index].isMonthPresent = true
+                        }, label: {
+                            Text("월매출")
+                                .font(.system(size: 15, weight: .bold))
+                                .foregroundColor(Color.black)
+                                .padding(.vertical, 10)
+                        })
+                        .frame(width: screenWidth/3 - 40)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 5)
+                                .stroke()
+                        }
+                        .sheet(isPresented: $vendingViewModel.drinks[index].isMonthPresent, content: {
+                            DrinkSalesView(title: "월매출", drink: "\(drink.fixedName)", list: vendingViewModel.sales.drinkMonthSales)
+                        })
+                        
+                    }
+                    .padding(10)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 5)
+                            .stroke()
+                    }
+                }
+                .overlay {
+                    Rectangle()
+                        .stroke()
+                }
+                Spacer()
+            }
+            .padding(.top, 10)
+            .padding(.horizontal, 10)
+            
+            Button(action: {
+                vendingViewModel.send(action: .fetchSales)
+            }, label: {
+                Text("매출 정보 갱신")
+                    .font(.system(size: 25, weight: .bold))
+                    .foregroundColor(Color.black)
+                    .padding(5)
+            })
+            .frame(width: screenWidth/3 * 2)
+            .overlay {
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke()
+            }
         }
     }
+    
+    
 }
 
 #Preview {
     ManagerView()
+        .environmentObject(VendingMachineViewModel())
 }

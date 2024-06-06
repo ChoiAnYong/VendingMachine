@@ -44,6 +44,18 @@ struct User {
 
 std::map<std::string, std::map<std::string, int>> drink_sales;
 
+// 일 매출을 저장할 맵
+std::map<std::string, int> daily_sales;
+
+// 월 매출을 저장할 맵
+std::map<std::string, int> monthly_sales;
+
+// 각 음료별 일 매출을 저장할 맵
+std::map<std::string, int> drink_daily_sales;
+
+// 각 음료별 월 매출을 저장할 맵
+std::map<std::string, int> drink_monthly_sales;
+
 // 파일에서 데이터 가져오는 부분
 std::map<std::string, std::string> load_eh_date() {
     std::ifstream infile(EXHAUSTION_FILE);
@@ -55,6 +67,38 @@ std::map<std::string, std::string> load_eh_date() {
     }
     
     return list;
+}
+
+// 파일에서 매출 정보를 읽어오는 함수
+void load_sales_data_response() {
+    std::ifstream infile(SALES_FILE);
+    std::string date, drink;
+    int amount;
+
+    while (infile >> date >> drink >> amount) {
+        // 일 매출 계산
+        daily_sales[date] += amount;
+        
+        // 월 매출 계산
+        std::string month = date.substr(0, 7);
+        monthly_sales[month] += amount;
+        
+        // 각 음료별 일 매출 계산
+        std::string data = date + ":" + drink;
+        drink_daily_sales[data] += amount;
+        
+        // 각 음료별 월 매출 계산
+        std::string drink_month = month + ":" + drink;
+        drink_monthly_sales[drink_month] += amount;
+    }
+}
+
+// 매출 정보를 초기화하는 함수
+void clear_sales_data() {
+    daily_sales.clear();
+    monthly_sales.clear();
+    drink_daily_sales.clear();
+    drink_monthly_sales.clear();
 }
 
 User load_user() {
@@ -126,8 +170,8 @@ std::string current_date() {
     tm* timePtr = localtime(&t);
     std::stringstream ss;
     ss << (timePtr->tm_year + 1900) << "-"
-       << (timePtr->tm_mon + 1) << "-"
-       << timePtr->tm_mday;
+       << std::setw(2) << std::setfill('0') << (timePtr->tm_mon + 1) << "-"
+       << std::setw(2) << std::setfill('0') << timePtr->tm_mday;
     return ss.str();
 }
 
@@ -136,7 +180,7 @@ std::string current_month() {
     tm* timePtr = localtime(&t);
     std::stringstream ss;
     ss << (timePtr->tm_year + 1900) << "-"
-       << (timePtr->tm_mon + 1);
+       << std::setw(2) << std::setfill('0') << (timePtr->tm_mon + 1);
     return ss.str();
 }
 
@@ -145,8 +189,8 @@ std::string current_date_time() {
     tm* timePtr = localtime(&t);
     std::stringstream ss;
     ss << (timePtr->tm_year + 1900) << "-"
-       << (timePtr->tm_mon + 1) << "-"
-       << timePtr->tm_mday << " "
+       << std::setw(2) << std::setfill('0') << (timePtr->tm_mon + 1) << "-"
+       << std::setw(2) << std::setfill('0') << timePtr->tm_mday << " "
        << timePtr->tm_hour << ":"
        << timePtr->tm_min;
     return ss.str();
@@ -201,7 +245,7 @@ void handle_buy(int client_sock, const std::string& drink, int index, int quanti
             save_eh_date(drink, date_time);
         }
         
-        response = "BUY: " + std::to_string(index) + " " + std::to_string(data[drink].stock);
+        response = "BUY: " + std::to_string(index) + " " + std::to_string(data[drink].stock) + "\nEND_OF_RESPONSE";
         
     } else {
         response = "Failed to buy " + drink + ". Not enough stock or invalid item.\n";
@@ -220,7 +264,7 @@ void handle_insertMoney(int client_sock, int price, int index) {
     if (data.count(price)) {
         data[price] += 1;
         save_money(data);
-        response = "INSERT: " + std::to_string(index) + " " + std::to_string(data[price]);
+        response = "INSERT: " + std::to_string(index) + " " + std::to_string(data[price]) + "\nEND_OF_RESPONSE";
     }
     
     broadcast_message(response);
@@ -244,7 +288,7 @@ void handle_return_money(int client_sock, const std::vector<int>& types, const s
     for (const auto& item: data) {
         ss << "RETURN: " << std::to_string(item.first) << " " << std::to_string(item.second) << std::endl;
     }
-    
+    ss << "END_OF_RESPONSE";
     std::string response = ss.str();
     broadcast_message(response);
 }
@@ -257,7 +301,7 @@ void handle_stock(int client_sock) {
     for (const auto& item : data) {
         ss << "STOCK: " << item.first << " " << item.second.stock << " " << item.second.price << " " << item.second.name << std::endl;
     }
-
+    ss << "END_OF_RESPONSE";
     std::string response = ss.str();
     broadcast_message(response);
 }
@@ -277,16 +321,7 @@ void handle_change_name(int client_sock, const std::string& old_name, const std:
     
     data[target].name = new_name;
     save_data(data);
-    response = "CHANGENAME: " + old_name + " " + new_name;
-//
-//    if (data.count(old_name)) {
-//        data[new_name] = data[old_name];
-//        data.erase(old_name);
-//        save_data(data);
-//        response = "CHANGENAME: " + old_name + " " + new_name;
-//    } else {
-//        response = "Failed" + old_name + " does not exist.\n";
-//    }
+    response = "CHANGENAME: " + old_name + " " + new_name + "\nEND_OF_RESPONSE";;
 
     broadcast_message(response);
 }
@@ -296,9 +331,8 @@ void handle_userInfo(int client_sock) {
     auto data = load_user();
     std::stringstream ss;
     
-    
     ss << "USERINFO: " << data.userId << " " << data.password << std::endl;
-    
+    ss << "END_OF_RESPONSE";
     std::string response = ss.str();
     
     broadcast_message(response);
@@ -312,7 +346,7 @@ void handle_money(int client_sock) {
     for (const auto& item : data) {
         ss << "MONEYINFO: " << item.first << " " << item.second << std::endl;
     }
-    
+    ss << "END_OF_RESPONSE";
     std::string response = ss.str();
     broadcast_message(response);
 }
@@ -327,7 +361,7 @@ void handle_change_password(int client_sock, const std::string& new_password) {
     
     std::string response;
     
-    response = "CHANGEPASSWORD: " + new_password;
+    response = "CHANGEPASSWORD: " + new_password + "\nEND_OF_RESPONSE";
     
     broadcast_message(response);
 }
@@ -340,7 +374,7 @@ void handle_change_price(int client_sock, const std::string& drink_name, const s
     if (data.count(drink_name)) {
         data[drink_name].price = std::stoi(new_price);
         save_data(data);
-        response = "CHANGEPRICE: " + drink_name + " " + new_price;
+        response = "CHANGEPRICE: " + drink_name + " " + new_price + "\nEND_OF_RESPONSE";
     } else {
         response = "Failed" + drink_name + " does not exist.\n";
     }
@@ -360,7 +394,7 @@ void handle_collect(int client_sock) {
     
     save_money(data);
     
-    std::string response = "COLLECT: ";
+    std::string response = "COLLECT: \nEND_OF_RESPONSE";
     
     broadcast_message(response);
 }
@@ -377,7 +411,7 @@ void handle_moneyreplenishment(int client_sock) {
     
     save_money(data);
     
-    std::string response = "MONEYREPLENISHMENT: ";
+    std::string response = "MONEYREPLENISHMENT: \nEND_OF_RESPONSE";
     
     broadcast_message(response);
 }
@@ -392,9 +426,68 @@ void handle_drinkreplenishment(int client_sock) {
     
     save_data(data);
     
-    std::string response = "DRINKREPLENISHMENT: ";
+    std::string response = "DRINKREPLENISHMENT: \nEND_OF_RESPONSE";
     
     broadcast_message(response);
+}
+
+void handle_fetch_Sales(int client_sock) {
+    std::lock_guard<std::mutex> lok(mtx);
+    
+    load_sales_data_response();
+    
+    // 일 매출, 월 매출, 각 음료별 일 매출, 각 음료별 월 매출을 하나의 문자열로 합치기
+    std::stringstream response_ss;
+    
+    response_ss << "SALES: \n";
+    
+    // 일 매출 추가
+    response_ss << "Daily_Sales: ";
+    for (const auto& entry : daily_sales) {
+        response_ss << entry.first << ":" << entry.second << " ";
+    }
+    response_ss << "\n";
+    
+    // 월 매출 추가
+    response_ss << "Monthly_Sales: ";
+    for (const auto& entry : monthly_sales) {
+        response_ss << entry.first << ":" << entry.second << " ";
+    }
+    response_ss << "\n";
+    
+    // 각 음료별 일 매출 추가
+    response_ss << "Drink_Daily_Sales: ";
+    for (const auto& entry : drink_daily_sales) {
+        response_ss << entry.first << ":" << entry.second << " ";
+    }
+    response_ss << "\n";
+    
+    // 각 음료별 월 매출 추가
+    response_ss << "Drink_Monthly_Sales: ";
+    for (const auto& entry : drink_monthly_sales) {
+        response_ss << entry.first << ":" << entry.second << " ";
+    }
+    response_ss << "\n";
+    
+    response_ss << "END_OF_RESPONSE";
+    
+    clear_sales_data();
+    
+    std::string response = response_ss.str();
+    
+    size_t total_bytes_sent = 0;
+    size_t response_size = response.size();
+    
+    while (total_bytes_sent < response_size) {
+        ssize_t bytes_sent = send(client_sock, response.c_str() + total_bytes_sent, response_size - total_bytes_sent, 0);
+        if (bytes_sent == -1) {
+            // 에러 발생 시 처리
+            perror("send");
+            close(client_sock);
+            return;
+        }
+        total_bytes_sent += bytes_sent;
+    }
 }
 
 void handle_client(int client_sock) {
@@ -464,6 +557,8 @@ void handle_client(int client_sock) {
             }
             
             handle_return_money(client_sock, types, counts);
+        } else if (command == "FETCHSALES") {
+            handle_fetch_Sales(client_sock);
         } else {
             std::string response = "Unknown command\n";
             broadcast_message(response);
