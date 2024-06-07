@@ -18,18 +18,19 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <arpa/inet.h>
 
-#define SERVER_PORT 9000
+#define SERVER_PORT 9001
 #define BUFSIZE 1024
-#define DATA_FILE "vending_machine_data.txt"
-#define SALES_FILE "sales_data.txt"
-#define USER_FILE "user_data.txt"
-#define MONEY_FILE "money_data.txt"
-#define EXHAUSTION_FILE "exhaustion_date.txt"
+#define DATA_FILE "vending_machine_data.txt" // 음료 정보
+#define SALES_FILE "sales_data.txt" // 매출 정보
+#define USER_FILE "user_data.txt" // 유저 정보
+#define MONEY_FILE "money_data.txt" // 화폐 정보
+#define EXHAUSTION_FILE "exhaustion_date.txt" // 재고 소진 음료와 날짜 정보
 
-std::mutex mtx;
-std::vector<int> client_sockets;
-std::mutex clients_mtx;
+std::mutex mtx;// 쓰레드 간 공유 자원인 데이터를 보호하기 위한 뮤텍스
+std::vector<int> client_sockets;// 클라이언트 소켓을 보관하는 벡터
+std::mutex clients_mtx;// 클라이언트 소켓에 대한 동시 접근을 보호하기 위한 뮤텍스
 
 struct Drink {
     int stock;
@@ -42,10 +43,11 @@ struct User {
     std::string password;
 };
 
+// 음료 판매 기록
 std::map<std::string, std::map<std::string, int>> drink_sales;
 
 // 일 매출을 저장할 맵
-std::map<std::string, int> daily_sales;
+std::map<std::string, int> daily_sales; // 트리 구조 사용
 
 // 월 매출을 저장할 맵
 std::map<std::string, int> monthly_sales;
@@ -55,6 +57,40 @@ std::map<std::string, int> drink_daily_sales;
 
 // 각 음료별 월 매출을 저장할 맵
 std::map<std::string, int> drink_monthly_sales;
+
+// 20204-06-07 형식으로 날짜를 생성하는 함수
+std::string current_date() {
+    time_t t = time(nullptr);
+    tm* timePtr = localtime(&t);
+    std::stringstream ss;
+    ss << (timePtr->tm_year + 1900) << "-"
+       << std::setw(2) << std::setfill('0') << (timePtr->tm_mon + 1) << "-"
+       << std::setw(2) << std::setfill('0') << timePtr->tm_mday;
+    return ss.str();
+}
+
+// 20204-06 형식으로 날짜를 생성하는 함수
+std::string current_month() {
+    time_t t = time(nullptr);
+    tm* timePtr = localtime(&t);
+    std::stringstream ss;
+    ss << (timePtr->tm_year + 1900) << "-"
+       << std::setw(2) << std::setfill('0') << (timePtr->tm_mon + 1);
+    return ss.str();
+}
+
+// 20204-06-07 17:12 형식으로 날짜를 생성하는 함수
+std::string current_date_time() {
+    time_t t = time(nullptr);
+    tm* timePtr = localtime(&t);
+    std::stringstream ss;
+    ss << (timePtr->tm_year + 1900) << "-"
+       << std::setw(2) << std::setfill('0') << (timePtr->tm_mon + 1) << "-"
+       << std::setw(2) << std::setfill('0') << timePtr->tm_mday << " "
+       << timePtr->tm_hour << ":"
+       << timePtr->tm_min;
+    return ss.str();
+}
 
 // 파일에서 데이터 가져오는 부분
 std::map<std::string, std::string> load_eh_date() {
@@ -101,6 +137,7 @@ void clear_sales_data() {
     drink_monthly_sales.clear();
 }
 
+//파일에서 유저 정보를 불러오는 함수
 User load_user() {
     std::ifstream infile(USER_FILE);
     User user;
@@ -113,6 +150,7 @@ User load_user() {
     return user;
 }
 
+//파일에서 화폐 정보를 불러오는 함수
 std::map<int, int> load_money() {
     std::ifstream infile(MONEY_FILE);
     std::map<int, int> moneys;
@@ -126,6 +164,7 @@ std::map<int, int> load_money() {
     return moneys;
 }
 
+// 파일에서 음료 정보를 불러오는 함수
 std::map<std::string, Drink> load_data() {
     std::ifstream infile(DATA_FILE);
     std::map<std::string, Drink> data;
@@ -138,19 +177,20 @@ std::map<std::string, Drink> load_data() {
     
     return data;
 }
-//
 
-// 파일에 데이터 업데이트 하는 부분
+// 재료 소진 정보를 파일에 쓰는 함수
 void save_eh_date(const std::string& drink, const std::string& date) {
     std::ofstream outfile(EXHAUSTION_FILE, std::ios::app); // 파일의 제일 마지막에 추가
     outfile << date << " " << drink << " 재고 소진" << std::endl;
 }
 
+// 유저 정보를 파일에 쓰는 함수
 void save_user(User user) {
     std::ofstream outfile(USER_FILE);
     outfile << user.userId << " " << user.password << std::endl;
 }
 
+//음료 정보를 파일에 쓰는 함수
 void save_data(const std::map<std::string, Drink>& data) {
     std::ofstream outfile(DATA_FILE);
     for (const auto& item : data) {
@@ -158,6 +198,7 @@ void save_data(const std::map<std::string, Drink>& data) {
     }
 }
 
+//화폐 정보를 파일에 쓰는 함수
 void save_money(const std::map<int, int>& data) {
     std::ofstream outfile(MONEY_FILE);
     for (const auto& item : data) {
@@ -165,37 +206,7 @@ void save_money(const std::map<int, int>& data) {
     }
 }
 
-std::string current_date() {
-    time_t t = time(nullptr);
-    tm* timePtr = localtime(&t);
-    std::stringstream ss;
-    ss << (timePtr->tm_year + 1900) << "-"
-       << std::setw(2) << std::setfill('0') << (timePtr->tm_mon + 1) << "-"
-       << std::setw(2) << std::setfill('0') << timePtr->tm_mday;
-    return ss.str();
-}
-
-std::string current_month() {
-    time_t t = time(nullptr);
-    tm* timePtr = localtime(&t);
-    std::stringstream ss;
-    ss << (timePtr->tm_year + 1900) << "-"
-       << std::setw(2) << std::setfill('0') << (timePtr->tm_mon + 1);
-    return ss.str();
-}
-
-std::string current_date_time() {
-    time_t t = time(nullptr);
-    tm* timePtr = localtime(&t);
-    std::stringstream ss;
-    ss << (timePtr->tm_year + 1900) << "-"
-       << std::setw(2) << std::setfill('0') << (timePtr->tm_mon + 1) << "-"
-       << std::setw(2) << std::setfill('0') << timePtr->tm_mday << " "
-       << timePtr->tm_hour << ":"
-       << timePtr->tm_min;
-    return ss.str();
-}
-
+// 매출 정보를 파일에 쓰는 함수
 void save_sales_data() {
     std::ofstream outfile(SALES_FILE);
 
@@ -210,6 +221,7 @@ void save_sales_data() {
     }
 }
 
+// 파일에서 매출 정보를 읽어오는 함수
 void load_sales_data() {
     std::ifstream infile(SALES_FILE);
     std::string date, drink;
@@ -221,6 +233,7 @@ void load_sales_data() {
     }
 }
 
+// 클라이언트에게 메시지를 브로드캐스트하는 함수
 void broadcast_message(const std::string& message) {
     std::lock_guard<std::mutex> lock(clients_mtx);
     for (int client_sock : client_sockets) {
@@ -228,6 +241,7 @@ void broadcast_message(const std::string& message) {
     }
 }
 
+// 음료 구매 요청을 처리하는 함수
 void handle_buy(int client_sock, const std::string& drink, int index, int quantity) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_data();
@@ -256,6 +270,7 @@ void handle_buy(int client_sock, const std::string& drink, int index, int quanti
     broadcast_message(response);
 }
 
+// 돈 투입 요청을 처리하는 함수
 void handle_insertMoney(int client_sock, int price, int index) {
     std::lock_guard<std::mutex> lock(mtx); // 동시 접근 방지
     auto data = load_money(); //현재 저장된 돈 데이터 불러옴
@@ -270,6 +285,7 @@ void handle_insertMoney(int client_sock, int price, int index) {
     broadcast_message(response);
 }
 
+// 잔돈 반환 요청을 처리하는 함수
 void handle_return_money(int client_sock, const std::vector<int>& types, const std::vector<int>& counts) {
     std::lock_guard<std::mutex> lock(mtx); // 동시 접근 방지
     auto data = load_money(); //현재 저장된 돈 데이터 불러옴
@@ -293,6 +309,7 @@ void handle_return_money(int client_sock, const std::vector<int>& types, const s
     broadcast_message(response);
 }
 
+// 재고 조회 요청을 처리하는 함수
 void handle_stock(int client_sock) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_data();
@@ -306,6 +323,7 @@ void handle_stock(int client_sock) {
     broadcast_message(response);
 }
 
+// 음료 이름 변경 요청을 처리하는 함수
 void handle_change_name(int client_sock, const std::string& old_name, const std::string& new_name) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_data();
@@ -326,6 +344,7 @@ void handle_change_name(int client_sock, const std::string& old_name, const std:
     broadcast_message(response);
 }
 
+// 사용자 정보 조회 요청을 처리하는 함수
 void handle_userInfo(int client_sock) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_user();
@@ -338,6 +357,7 @@ void handle_userInfo(int client_sock) {
     broadcast_message(response);
 }
 
+// 화폐 정보 조회 요청을 처리하는 함수
 void handle_money(int client_sock) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_money();
@@ -351,6 +371,7 @@ void handle_money(int client_sock) {
     broadcast_message(response);
 }
 
+// 비밀번호 변경 요청을 처리하는 함수
 void handle_change_password(int client_sock, const std::string& new_password) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_user();
@@ -366,6 +387,7 @@ void handle_change_password(int client_sock, const std::string& new_password) {
     broadcast_message(response);
 }
 
+// 음료 가격 변경 요청을 처리하는 함수
 void handle_change_price(int client_sock, const std::string& drink_name, const std::string& new_price) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_data();
@@ -382,6 +404,7 @@ void handle_change_price(int client_sock, const std::string& drink_name, const s
     broadcast_message(response);
 }
 
+// 수금 요청을 처리하는 함수
 void handle_collect(int client_sock) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_money();
@@ -399,6 +422,7 @@ void handle_collect(int client_sock) {
     broadcast_message(response);
 }
 
+// 화폐 보충 요청을 처리하는 함수
 void handle_moneyreplenishment(int client_sock) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_money();
@@ -416,6 +440,7 @@ void handle_moneyreplenishment(int client_sock) {
     broadcast_message(response);
 }
 
+// 음료 보충 요청을 처리하는 함수
 void handle_drinkreplenishment(int client_sock) {
     std::lock_guard<std::mutex> lock(mtx);
     auto data = load_data();
@@ -431,6 +456,7 @@ void handle_drinkreplenishment(int client_sock) {
     broadcast_message(response);
 }
 
+// 매출 정보 조회 요청을 처리하는 함수
 void handle_fetch_Sales(int client_sock) {
     std::lock_guard<std::mutex> lok(mtx);
     
@@ -509,7 +535,8 @@ void handle_client(int client_sock) {
         std::stringstream ss(message);
         std::string command, drink, quantity_str, index_str, price_str;
         ss >> command;
-
+        
+        // 클라이언트로부터 받은 명령에 따라 처리하는 부분
         if (command == "BUY") {
             ss >> drink >> index_str >> quantity_str;
             int quantity = std::stoi(quantity_str);
@@ -573,8 +600,8 @@ void handle_client(int client_sock) {
 }
 
 int main() {
-    load_sales_data();
-    int server_sock = socket(AF_INET, SOCK_STREAM, 0);
+    load_sales_data(); // 매출 데이터 로드
+    int server_sock = socket(AF_INET, SOCK_STREAM, 0); // 서버 소켓 생성
     if (server_sock == -1) {
         perror("socket");
         return 1;
@@ -608,9 +635,11 @@ int main() {
             perror("accept");
             continue;
         }
-        
-        std::cout << "Client connected, client_sock: " << client_sock << std::endl;
-        std::thread(handle_client, client_sock).detach();
+        // 클라이언트의 IP 주소를 문자열로 변환하여 출력
+        char ip_address[INET_ADDRSTRLEN]; // IP 주소를 저장할 버퍼
+        inet_ntop(AF_INET, &(client_addr.sin_addr), ip_address, INET_ADDRSTRLEN); // 네트워크 주소를 문자열로 변환
+        std::cout << "Client connected, IP: " << ip_address << ", Port: " << ntohs(client_addr.sin_port) << std::endl;
+        std::thread(handle_client, client_sock).detach(); // 클라이언트 핸들링을 위한 스레드 생성 및 분리
     }
     
     close(server_sock);

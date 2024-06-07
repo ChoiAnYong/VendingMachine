@@ -9,10 +9,11 @@ import SwiftUI
 
 struct ChangePasswordView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var viewModel = ChangePasswordViewModel()
-    @FocusState private var textFocus
-    @EnvironmentObject private var authViewModel: AuthViewModel
     @EnvironmentObject private var vendingViewModel: VendingMachineViewModel
+    
+    @StateObject private var viewModel = ChangePasswordViewModel()
+    
+    @FocusState private var textFocus
     
     var body: some View {
         NavigationStack {
@@ -50,11 +51,15 @@ struct ChangePasswordView: View {
                 .alert(isPresented: $viewModel.isPresentAlert) {
                     switch viewModel.alertMode {
                     case .fail:
-                        return Alert(title: Text("변경 실패"), message: Text("비밀번호는 특수문자 및 숫자가 각각 하나 이상 포함된 8자리 이상이여야 합니다."), dismissButton: .cancel(Text("확인"), action: {
+                        return Alert(title: Text("변경 실패"), 
+                                     message: Text("비밀번호는 특수문자 및 숫자가 각각 하나 이상 포함된 8자리 이상이여야 합니다."),
+                                     dismissButton: .cancel(Text("확인"), action: {
                             viewModel.alertMode = .none
                         }))
                     case .success:
-                        return Alert(title: Text("변경 성공"), message: Text("비밀번호가 변경되었습니다."), dismissButton: .cancel(Text("확인"), action: {
+                        return Alert(title: Text("변경 성공"), 
+                                     message: Text("비밀번호가 변경되었습니다."),
+                                     dismissButton: .cancel(Text("확인"), action: {
                             dismiss()
                         }))
                     case .none:

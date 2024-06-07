@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// 음료의 가격을 바꾸기 위한 View
 struct ChangePriceView: View {
     @Environment(\.dismiss) var dismiss
     

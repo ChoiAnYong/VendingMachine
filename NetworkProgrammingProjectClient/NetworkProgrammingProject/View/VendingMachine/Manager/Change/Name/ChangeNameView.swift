@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// 음료 이름을 바꾸기 위한 View
 struct ChangeNameView: View {
     @Environment(\.dismiss) var dismiss
     

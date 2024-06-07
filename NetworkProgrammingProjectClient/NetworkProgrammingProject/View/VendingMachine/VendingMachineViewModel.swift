@@ -7,20 +7,21 @@
 import Foundation
 import Network
 
+// 서버로 요청을 보내는 메서드
 enum Action {
-    case insertMoney(index: Int)
-    case purchase(index: Int)
-    case returnMoney
-    case fetchStock
-    case fetchUser
-    case fetchMoney
-    case changePassword(newPassword: String)
-    case collectMoney
-    case moneyReplenishment
-    case drinkReplenishment
-    case changeName(oldName: String, newName: String)
-    case changePrice(drinkName: String, price: String)
-    case fetchSales
+    case insertMoney(index: Int) // 화폐 투입시
+    case purchase(index: Int) // 음료 구매시
+    case returnMoney // 화폐 반환시
+    case fetchStock // 음료 정보 로드시
+    case fetchUser // 유저 정보 로드시
+    case fetchMoney // 화폐 정보 로드시
+    case changePassword(newPassword: String) // 비밀번호 변경시
+    case collectMoney // 화폐 수금시
+    case moneyReplenishment // 화폐 재고 충전시
+    case drinkReplenishment // 음료 재고 충전시
+    case changeName(oldName: String, newName: String) // 음료 이름 변경시
+    case changePrice(drinkName: String, price: String) // 음료 가격 변경시
+    case fetchSales // 매출 정보 로드시
 }
 
 enum DrinkAlert {
@@ -55,6 +56,7 @@ final class VendingMachineViewModel: ObservableObject {
         send(action: .fetchUser)
     }
     
+    // 액션을 처리하는 메서드
     func send(action: Action) {
         switch action {
         case .insertMoney(let index):
@@ -106,7 +108,7 @@ final class VendingMachineViewModel: ObservableObject {
 extension VendingMachineViewModel {
     private func setupConnection() {
         let host = NWEndpoint.Host("127.0.0.1")
-        let port = NWEndpoint.Port(integerLiteral: 9000)
+        let port = NWEndpoint.Port(integerLiteral: 9001)
         
         connection = NWConnection(host: host, port: port, using: .tcp)
         connection?.stateUpdateHandler = { newState in

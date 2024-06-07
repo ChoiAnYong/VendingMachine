@@ -7,23 +7,26 @@
 
 import Foundation
 
+// Alert의 종류
 enum PriceAlert {
-    case fail
-    case success
-    case none
+    case fail // 실패
+    case success // 성공
+    case none // 초기값
 }
 
 final class ChangePriceViewModel: ObservableObject {
-    @Published var drinkName = ""
-    @Published var priceString = ""
-    @Published var isPresentAlert = false
-    @Published var alertMode: PriceAlert = .none
-    private var currentDrinks: [Drink] = []
+    @Published var drinkName = "" // 가격을 바꾸려는 음료의 이름
+    @Published var priceString = "" // 새로운 가격
+    @Published var isPresentAlert = false // Alert를 띄워야하되는지를 저장할 변수
+    @Published var alertMode: PriceAlert = .none // Alert의 종류
+    private var currentDrinks: [Drink] = [] // 현재 음료의 정보
 
+    //음료 정보를 외부에서 주입받기 위한 함수
     func initDrinks(_ drinks: [Drink]) {
         currentDrinks = drinks
     }
     
+    //변경 가능한 가격인지 검사하는 함수
     func isPriceValid() -> Bool {
         let price = Int(priceString)!
         

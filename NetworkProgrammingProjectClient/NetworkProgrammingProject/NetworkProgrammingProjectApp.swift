@@ -14,7 +14,7 @@ struct NetworkProgrammingProjectApp: App {
     var body: some Scene {
         WindowGroup {
             AuthView(viewModel: AuthViewModel())
-                .environmentObject(viewModel)               
+                .environmentObject(viewModel) // 모든 자식뷰에서 VendingMachineViewModel를 사용할 수 있도록 의존성 주입
         }
     }
 }

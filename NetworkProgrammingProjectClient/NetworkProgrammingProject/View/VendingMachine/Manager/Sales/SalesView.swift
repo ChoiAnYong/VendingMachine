@@ -7,15 +7,19 @@
 
 import SwiftUI
 
+//자판기의 매출을 보여줄 View
 struct SalesView: View {
-    private let title: String
-    private let list: [(String, Int)]
-    private let screenWidth = UIScreen.main.bounds.width
+    private let title: String // 일 매출 or 월 매출
+    private let list: [(String, Int)] // (날짜, 매출)를 담고 있는 배열
+    private let screenWidth = UIScreen.main.bounds.width // 현재 디바이스 사이즈
+    
+    //생성자
     init(title: String, list: [(String, Int)]) {
         self.title = title
         self.list = list
     }
     
+    //매출 정보 유무에 따라 화면을 분기
     @ViewBuilder
     var body: some View {
         if !list.isEmpty {

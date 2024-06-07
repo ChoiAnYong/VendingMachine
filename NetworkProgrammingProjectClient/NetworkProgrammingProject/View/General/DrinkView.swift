@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// 자판기의 음료 정보를 나타낼 View
 struct DrinkView: View {
     @EnvironmentObject var viewModel: VendingMachineViewModel
     let screenwidth = UIScreen.main.bounds.width
@@ -50,13 +51,9 @@ struct DrinkView: View {
                 if drink.stock == 0 {
                     VStack {
                         Spacer()
-                        HStack {
-                            Spacer()
-                            Text("품절")
-                                .font(.system(size: 30, weight: .bold))
-                                .foregroundColor(Color.red)
-                            Spacer()
-                        }
+                        Image("soldout")
+                            .resizable()
+                            .scaledToFit()
                         Spacer()
                     }
                     .foregroundColor(.black)
@@ -86,6 +83,6 @@ struct DrinkView: View {
 }
 
 #Preview {
-    DrinkView(drink: .init(name: "coffee", price: 10, stock: 10, fixedName: "물"), index: 1)
+    DrinkView(drink: .init(name: "coffee", price: 10, stock: 0, fixedName: "물"), index: 1)
         .environmentObject(VendingMachineViewModel())
 }

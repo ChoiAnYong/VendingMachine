@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// 관리자로 로그인하기 위한 View
 struct LoginView: View {
     @Environment(\.dismiss) var dismiss
     

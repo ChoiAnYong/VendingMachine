@@ -7,16 +7,18 @@
 
 import SwiftUI
 
+//음료의 매출을 보여줄 View
 struct DrinkSalesView: View {
-    private let title: String
-    private let drink: String
+    private let title: String // 일 매출 or 월 매출
+    private let drink: String // 음료
     private let list: [(String, String, Int)] // date, drink, sales
     private let screenWidth = UIScreen.main.bounds.width
    
+    
     init(title: String, drink: String, list: [(String, String, Int)]) {
         self.title = title
         self.drink = drink
-        self.list = list.filter { $0.1 == drink}
+        self.list = list.filter { $0.1 == drink} // 현재 음료에 해당하는 데이터만 분리해서 초기화
     }
     
     @ViewBuilder

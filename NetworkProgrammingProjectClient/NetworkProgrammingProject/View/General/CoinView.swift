@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// 자판기에 화폐를 띄울 View
 struct CoinView: View {
     @EnvironmentObject var viewModel: VendingMachineViewModel
     let screenwidth = UIScreen.main.bounds.width
